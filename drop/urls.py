@@ -15,6 +15,8 @@ urlpatterns = [
     path('docs/', views.docs_view, name='docs'),
     path('file/<str:pin>/preview/', views.file_preview_view, name='file_preview'),
     path('file/<str:pin>/download/', views.file_download_view, name='file_download'),
+    path('robots.txt', views.robots_txt_view, name='robots_txt'),
+    path('sitemap.xml', views.sitemap_xml_view, name='sitemap_xml'),
     re_path(r'^.*$', views.custom_404_view, name='404_catchall'),
 ]
 

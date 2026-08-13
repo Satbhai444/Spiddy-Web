@@ -5,3 +5,5 @@ db.sqlite3
 media/
 staticfiles_build/
 .vercel
+
+.vercel

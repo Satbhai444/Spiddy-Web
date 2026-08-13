@@ -4,9 +4,48 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SPIDDY - Web File Drop</title>
+    <title>{% block title %}SPIDDY — Web File Drop | Free Anonymous Temporary File Sharing{% endblock %}</title>
+    
+    <!-- Primary Meta SEO Tags -->
+    <meta name="description" content="Share large files up to 2GB instantly with secret 6-digit PIN. Anonymous, encrypted, auto self-destructs in 24 hours. No signup required.">
+    <meta name="keywords" content="file transfer, anonymous file drop, temporary file upload, 2gb file share, encrypted file drop, self destructing files, spiddy web, secret pin file share">
+    <meta name="robots" content="index, follow">
+    <meta name="author" content="SpiddyWeb">
+
+    <!-- Open Graph / Facebook / WhatsApp Meta Tags -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="SPIDDY — Web File Drop | Fast Anonymous File Sharing">
+    <meta property="og:description" content="Share files up to 2GB with a secret 6-digit PIN. Anonymous, encrypted, auto self-destructs in 24 hours.">
+    <meta property="og:url" content="https://spiddy-web.vercel.app/">
+    <meta property="og:site_name" content="SpiddyWeb">
+
+    <!-- Twitter Card Meta Tags -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="SPIDDY — Web File Drop">
+    <meta name="twitter:description" content="Share files up to 2GB with a secret 6-digit PIN. Self-destructs in 24 hours.">
+
+    <!-- Canonical URL -->
+    <link rel="canonical" href="https://spiddy-web.vercel.app{{ request.path }}">
     <link rel="icon"
         href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%95%B7%EF%B8%8F%3C/text%3E%3C/svg%3E">
+
+    <!-- Schema.org JSON-LD Structured Data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "SpiddyWeb File Drop",
+      "url": "https://spiddy-web.vercel.app",
+      "description": "High-speed temporary file sharing with secret PIN security, 2GB upload limit, and auto self-destruction.",
+      "applicationCategory": "UtilitiesApplication",
+      "operatingSystem": "All",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      }
+    }
+    </script>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js"></script>
