@@ -1,0 +1,54 @@
+{% extends 'drop/base.html' %}
+
+{% block main_class %}w-full max-w-2xl{% endblock %}
+
+{% block content %}
+<div class="spidey-card p-8 mb-12">
+    <h2 class="text-3xl spidey-title text-white mb-2">Contact</h2>
+    <p class="text-gray-400 mb-8">Kisi user ko issue ho, bug mila ho, ya urgent removal chahiye ho, yahan message bhej
+        sakte ho.</p>
+    <p class="text-gray-500 text-xs mb-8">Recipient inbox default: darshansatbhai4@gmail.com</p>
+
+    {% if sent %}
+    <div
+        class="bg-green-900/50 border border-green-500 text-green-200 p-4 rounded-lg mb-6 text-sm text-center font-semibold">
+        ✅ Message delivered to owner inbox. We'll get back to you soon.
+    </div>
+    {% endif %}
+    {% if error %}
+    <div class="bg-red-900/50 border border-red-500 text-red-300 p-4 rounded-lg mb-6 text-sm text-center font-semibold">
+        🚫 {{ error }}
+    </div>
+    {% endif %}
+
+    <form action="{% url 'contact' %}" method="post" class="space-y-5">
+        {% csrf_token %}
+        <div>
+            <label class="block text-xs uppercase tracking-widest text-gray-500 mb-2">Topic</label>
+            <select name="subject"
+                class="w-full bg-gray-900 border border-gray-700 rounded-lg p-3 text-white focus:outline-none focus:border-blue-400">
+                <option>General</option>
+                <option>Bug Report</option>
+                <option>Privacy Concern</option>
+                <option>DMCA / Removal</option>
+                <option>Security Report</option>
+            </select>
+        </div>
+        <div>
+            <label class="block text-xs uppercase tracking-widest text-gray-500 mb-2">Your Email</label>
+            <input type="email" name="email"
+                class="w-full bg-gray-900 border border-gray-700 rounded-lg p-3 text-white focus:outline-none focus:border-blue-400"
+                placeholder="you@example.com">
+        </div>
+        <div>
+            <label class="block text-xs uppercase tracking-widest text-gray-500 mb-2">Message</label>
+            <textarea name="message" rows="7" required
+                class="w-full bg-gray-900 border border-gray-700 rounded-lg p-3 text-white focus:outline-none focus:border-blue-400"
+                placeholder="Problem kya hai, PIN ya link kya tha, aur hume kya dekhna chahiye..."></textarea>
+        </div>
+        <button type="submit"
+            class="w-full btn-red text-white font-bold py-3 px-4 rounded-lg uppercase tracking-wider">Send
+            Message</button>
+    </form>
+</div>
+{% endblock %}

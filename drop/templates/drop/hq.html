@@ -1,0 +1,104 @@
+{% extends 'drop/base.html' %}
+
+{% block main_class %}w-full max-w-5xl px-4{% endblock %}
+
+{% block content %}
+<div class="pt-24 pb-16">
+    <div class="flex items-center justify-between mb-8" data-reveal>
+        <div>
+            <h1 class="spidey-title text-4xl text-white">SPIDEY HQ DASHBOARD</h1>
+            <p class="text-xs uppercase tracking-widest text-red-400 font-bold">System Status &amp; Live Drops Analytics</p>
+        </div>
+        <a href="{% url 'home' %}" class="btn-blue text-xs font-bold py-2 px-4 rounded-lg uppercase tracking-wider">← Back to App</a>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="grid grid-cols-1 sm:grid-cols-4 gap-4 mb-8" data-stagger-group>
+        <div class="spidey-card web-panel p-5" data-page-card>
+            <div class="shine-layer"></div>
+            <div class="text-xs uppercase tracking-widest text-gray-500 mb-1">Active Drops</div>
+            <div class="text-3xl font-extrabold text-green-400">{{ active_drops_count }}</div>
+        </div>
+        <div class="spidey-card web-panel p-5" data-page-card>
+            <div class="shine-layer"></div>
+            <div class="text-xs uppercase tracking-widest text-gray-500 mb-1">Expired Drops</div>
+            <div class="text-3xl font-extrabold text-red-400">{{ expired_drops_count }}</div>
+        </div>
+        <div class="spidey-card web-panel p-5" data-page-card>
+            <div class="shine-layer"></div>
+            <div class="text-xs uppercase tracking-widest text-gray-500 mb-1">Active Storage</div>
+            <div class="text-3xl font-extrabold text-blue-400">{{ active_storage_fmt }}</div>
+        </div>
+        <div class="spidey-card web-panel p-5" data-page-card>
+            <div class="shine-layer"></div>
+            <div class="text-xs uppercase tracking-widest text-gray-500 mb-1">Total Lifetime</div>
+            <div class="text-3xl font-extrabold text-white">{{ total_drops }}</div>
+        </div>
+    </div>
+
+    <!-- Actions & Purge -->
+    {% if expired_drops_count > 0 %}
+    <div class="spidey-card p-6 mb-8 border-red-500 flex items-center justify-between" data-reveal>
+        <div>
+            <h3 class="font-bold text-white mb-1">🧹 Cleanup Required</h3>
+            <p class="text-xs text-gray-400">{{ expired_drops_count }} expired drop(s) lingering in storage.</p>
+        </div>
+        <form method="post" action="{% url 'hq' %}">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="purge">
+            <button type="submit" class="btn-red text-white text-xs font-bold py-2.5 px-6 rounded-lg uppercase tracking-wider">Purge Expired Drops Now</button>
+        </form>
+    </div>
+    {% endif %}
+
+    <!-- Extension Breakdown & Active Drops Table -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div class="spidey-card p-6 lg:col-span-1" data-reveal>
+            <h3 class="font-bold text-white text-lg mb-4 border-b border-gray-800 pb-2">📊 File Types</h3>
+            <div class="space-y-3">
+                {% for ext, count in ext_counts.items %}
+                <div class="flex justify-between items-center text-sm">
+                    <span class="font-mono text-gray-300 uppercase">{{ ext }}</span>
+                    <span class="bg-gray-800 text-blue-400 font-bold px-2.5 py-0.5 rounded-full text-xs">{{ count }} file{{ count|pluralize }}</span>
+                </div>
+                {% empty %}
+                <div class="text-gray-500 text-sm">No active drops</div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="spidey-card p-6 lg:col-span-2 overflow-x-auto" data-reveal>
+            <h3 class="font-bold text-white text-lg mb-4 border-b border-gray-800 pb-2">🕸️ Active Drops List</h3>
+            <table class="w-full text-left text-xs text-gray-300">
+                <thead>
+                    <tr class="border-b border-gray-800 text-gray-500 uppercase">
+                        <th class="py-2">PIN</th>
+                        <th class="py-2">Filename</th>
+                        <th class="py-2">Size</th>
+                        <th class="py-2">Security</th>
+                        <th class="py-2">Downloads</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-800/50">
+                    {% for drop in active_drops %}
+                    <tr>
+                        <td class="py-2.5 font-mono font-bold text-blue-400">{{ drop.pin }}</td>
+                        <td class="py-2.5 truncate max-w-[180px]" title="{{ drop.original_filename }}">{{ drop.original_filename }}</td>
+                        <td class="py-2.5 text-gray-400">{{ drop.file.size|filesizeformat }}</td>
+                        <td class="py-2.5 font-semibold">
+                            {% if drop.password %}<span class="text-yellow-400">🔒 Pass</span>{% else %}<span class="text-gray-500">Public</span>{% endif %}
+                            {% if drop.one_time %} <span class="text-red-400">1-Time</span>{% endif %}
+                        </td>
+                        <td class="py-2.5 font-mono text-center">{{ drop.download_count }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="5" class="py-4 text-center text-gray-500">No active drops right now</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

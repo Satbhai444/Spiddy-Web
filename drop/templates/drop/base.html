@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SPIDDY - Web File Drop</title>
+    <link rel="icon"
+        href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%95%B7%EF%B8%8F%3C/text%3E%3C/svg%3E">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Bangers&family=Inter:wght@400;600;800&display=swap');
+
+        body {
+            background-color: #0f0f13;
+            color: #ffffff;
+            font-family: 'Inter', sans-serif;
+            background-image:
+                radial-gradient(circle at 50% 50%, rgba(226, 54, 54, 0.1) 0%, transparent 60%),
+                repeating-radial-gradient(circle at center, transparent, transparent 40px, rgba(255, 255, 255, 0.03) 41px, transparent 42px),
+                repeating-conic-gradient(from 0deg at center, transparent 0deg, transparent 15deg, rgba(255, 255, 255, 0.03) 16deg, transparent 17deg);
+            background-attachment: fixed;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: "";
+            position: fixed;
+            inset: -12%;
+            background:
+                radial-gradient(circle at 16% 20%, rgba(226, 54, 54, 0.18), transparent 30%),
+                radial-gradient(circle at 84% 12%, rgba(81, 140, 202, 0.16), transparent 28%),
+                radial-gradient(circle at 50% 90%, rgba(255, 255, 255, 0.05), transparent 26%);
+            filter: blur(18px);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        body>* {
+            position: relative;
+            z-index: 1;
+        }
+
+        .spidey-title {
+            font-family: 'Bangers', cursive;
+            letter-spacing: 3px;
+            font-style: italic;
+            text-shadow: 3px 3px 0px #E23636, -2px -2px 0px #518CCA, 4px 4px 8px rgba(0,0,0,0.8);
+        }
+
+        .spidey-card {
+            background: rgba(20, 20, 25, 0.85);
+            backdrop-filter: blur(12px);
+            border: 2px solid #518CCA;
+            box-shadow: 0 0 20px rgba(226, 54, 54, 0.2), inset 0 0 10px rgba(81, 140, 202, 0.2);
+            border-radius: 16px;
+            transform: translateZ(0);
+        }
+
+        .web-panel {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .shine-layer {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(110deg, transparent 0%, rgba(255, 255, 255, 0.07) 38%, transparent 72%);
+            transform: translateX(-135%);
+            pointer-events: none;
+        }
+
+        .motion-line {
+            position: relative;
+            display: inline-block;
+        }
+
+        .motion-line::after {
+            content: "";
+            position: absolute;
+            left: 0;
+            bottom: -0.35rem;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, #E23636, #518CCA);
+            opacity: 0.55;
+            transform-origin: left;
+            transform: scaleX(0.2);
+        }
+
+        .btn-red {
+            background: linear-gradient(135deg, #E23636, #b01c1c);
+            box-shadow: 0 4px 15px rgba(226, 54, 54, 0.4);
+            border: 1px solid #ff4d4d;
+            transition: all 0.2s ease;
+        }
+
+        .btn-red:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(226, 54, 54, 0.6);
+        }
+
+        .btn-blue {
+            background: linear-gradient(135deg, #518CCA, #2c5987);
+            box-shadow: 0 4px 15px rgba(81, 140, 202, 0.4);
+            border: 1px solid #71a9e3;
+            transition: all 0.2s ease;
+        }
+
+        .btn-blue:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(81, 140, 202, 0.6);
+        }
+
+        /* Reveal animation defaults */
+        [data-reveal],
+        [data-stagger-group]>* {
+            transition: opacity 0.5s ease, transform 0.5s ease;
+        }
+
+        /* Comic Bubble Style */
+        .comic-bubble {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            left: auto;
+            top: auto;
+            background: #ffffff;
+            color: #111;
+            border-radius: 20px;
+            padding: 14px 20px;
+            font-family: 'Inter', sans-serif;
+            font-size: 13px;
+            line-height: 1.4;
+            max-width: 320px;
+            box-shadow: 4px 4px 0px #E23636, 0 10px 25px rgba(0,0,0,0.5);
+            z-index: 9990;
+            border: 3px solid #111;
+            opacity: 0;
+            pointer-events: none;
+            transform-origin: bottom right;
+        }
+        
+        .comic-bubble strong {
+            color: #E23636;
+            font-weight: 800;
+            text-transform: uppercase;
+            font-size: 12px;
+            letter-spacing: 1px;
+            display: block;
+            margin-bottom: 4px;
+        }
+
+        .comic-bubble::after {
+            content: '';
+            position: absolute;
+            bottom: -15px;
+            right: 40px;
+            border-width: 15px 15px 0 0;
+            border-style: solid;
+            border-color: #ffffff transparent transparent transparent;
+        }
+
+        .comic-bubble::before {
+            content: '';
+            position: absolute;
+            bottom: -20px;
+            right: 37px;
+            border-width: 19px 19px 0 0;
+            border-style: solid;
+            border-color: #111 transparent transparent transparent;
+            z-index: -1;
+        }
+        
+        /* Mobile Responsiveness */
+        @media (max-width: 640px) {
+            .spidey-title {
+                font-size: 4rem; /* Smaller title on mobile */
+            }
+            header p {
+                font-size: 0.75rem; /* Smaller subtitle */
+            }
+            .comic-bubble {
+                max-width: 220px;
+                padding: 12px 16px;
+                font-size: 12px;
+                border-radius: 16px;
+                box-shadow: 2px 2px 0px #E23636, 0 5px 15px rgba(0,0,0,0.5);
+            }
+            .comic-bubble strong {
+                font-size: 10px;
+            }
+        }
+    </style>
+</head>
+
+<body class="flex flex-col items-center p-4">
+
+    {% block header %}
+    <header class="text-center mb-8 mt-12" data-reveal="header">
+        <h1 class="text-6xl text-white spidey-title mb-2 motion-line">
+            <a href="{% url 'home' %}" class="hover:opacity-80 transition-opacity">SPIDDY</a>
+        </h1>
+        <p class="text-gray-400 font-semibold tracking-wide uppercase text-sm">With great power comes great file sharing
+        </p>
+    </header>
+    {% endblock %}
+
+    <main class="{% block main_class %}w-full max-w-md{% endblock %}">
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer class="mt-16 text-gray-400 text-xs text-center space-y-3 pb-8" data-reveal="footer">
+        <div class="flex flex-wrap justify-center items-center gap-3 text-gray-400">
+            <a href="{% url 'home' %}" class="hover:text-red-400 transition-colors">Home</a>
+            <span>&middot;</span>
+            <a href="{% url 'upload' %}" class="hover:text-red-400 transition-colors">Upload</a>
+            <span>&middot;</span>
+            <a href="{% url 'download' %}" class="hover:text-blue-400 transition-colors">Download</a>
+            <span>&middot;</span>
+            <a href="{% url 'docs' %}" class="hover:text-yellow-400 transition-colors font-bold">Docs 📚</a>
+            <span>&middot;</span>
+            <a href="{% url 'privacy' %}" class="hover:text-gray-200 transition-colors">Privacy</a>
+            <span>&middot;</span>
+            <a href="{% url 'terms' %}" class="hover:text-gray-200 transition-colors">Terms</a>
+            <span>&middot;</span>
+            <a href="{% url 'dmca' %}" class="hover:text-gray-200 transition-colors">DMCA</a>
+            <span>&middot;</span>
+            <a href="{% url 'contact' %}" class="hover:text-gray-200 transition-colors">Contact</a>
+        </div>
+        <div class="flex items-center justify-center gap-2 text-gray-500">
+            <span class="w-2 h-2 rounded-full bg-green-500 animate-ping"></span>
+            <span>🟢 Server Encrypted &amp; Online &nbsp;&middot;&nbsp; &copy; 2026 SPIDDY Web Drop</span>
+        </div>
+    </footer>
+
+    <!-- Global Comic Bubble -->
+    <div id="spideyFactBubble" class="comic-bubble">
+        <strong id="spideyFactType" class="text-red-500 uppercase tracking-widest block mb-1"></strong>
+        <p id="spideyFactText" class="text-gray-800 m-0"></p>
+    </div>
+
+    <!-- Spidey Pendulum Web Drop Animation -->
+    <div id="pendulumPivot" class="fixed top-0 left-1/2 z-[9999] pointer-events-none flex flex-col items-center origin-top" style="transform: translateX(-50%);">
+        <div id="spiderWebLine" class="w-[2px] bg-gray-400" style="height: 0px; box-shadow: 0 0 5px rgba(255,255,255,0.5);"></div>
+        <div id="spiderEmoji" class="text-5xl" style="opacity: 0; margin-top: -10px; filter: drop-shadow(0px 5px 5px rgba(0,0,0,0.5));">🕷️</div>
+    </div>
+
+    <!-- CTA Hover Popup -->
+    <div id="ctaPopup" class="fixed pointer-events-none opacity-0 z-[2000] bg-white text-black text-xs font-bold px-3 py-1.5 rounded shadow-[2px_2px_0px_#E23636] border-2 border-black transition-opacity duration-200" style="transform: translate(-50%, -100%); margin-top: -10px;">
+        <span id="ctaPopupText"></span>
+        <div class="absolute w-0 h-0 border-l-[6px] border-r-[6px] border-t-[8px] border-t-black border-l-transparent border-r-transparent left-1/2 -bottom-[10px] -translate-x-1/2"></div>
+        <div class="absolute w-0 h-0 border-l-[4px] border-r-[4px] border-t-[5px] border-t-white border-l-transparent border-r-transparent left-1/2 -bottom-[5px] -translate-x-1/2"></div>
+    </div>
+
+    <!-- Spider-Sense Toast Notification -->
+    <div id="spiderSenseToast" class="fixed top-6 right-6 z-[9999] pointer-events-none opacity-0 transform translate-y-[-20px] transition-all duration-300 bg-red-600 text-white font-extrabold px-5 py-3 rounded-2xl border-2 border-yellow-400 shadow-[0_0_20px_rgba(226,54,54,0.8)] flex items-center gap-3">
+        <span class="text-2xl animate-pulse">⚡</span>
+        <div>
+            <div id="toastTitle" class="text-xs uppercase tracking-widest text-yellow-300">SPIDER-SENSE TINGLE!</div>
+            <div id="toastMessage" class="text-sm font-bold text-white"></div>
+        </div>
+    </div>
+
+    <script>
+        // Web Audio API Web Shooter "Thwip!" Sound Synthesizer
+        window.playThwipSound = function() {
+            try {
+                const AudioCtx = window.AudioContext || window.webkitAudioContext;
+                if (!AudioCtx) return;
+                const ctx = new AudioCtx();
+                
+                // Frequency sweep (high pitch whip down to low snap)
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(950, ctx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(120, ctx.currentTime + 0.12);
+                
+                gain.gain.setValueAtTime(0.4, ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.12);
+                
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+                
+                osc.start(ctx.currentTime);
+                osc.stop(ctx.currentTime + 0.12);
+            } catch (e) {
+                console.log('Audio FX disabled');
+            }
+        };
+
+        // Spider-Sense Toast Trigger
+        window.showSpiderSenseToast = function(msg, title = "SPIDER-SENSE TINGLE!") {
+            const toast = document.getElementById('spiderSenseToast');
+            const titleEl = document.getElementById('toastTitle');
+            const msgEl = document.getElementById('toastMessage');
+            if (!toast || !msgEl) return;
+            
+            titleEl.textContent = title;
+            msgEl.textContent = msg;
+            
+            toast.classList.remove('opacity-0', 'translate-y-[-20px]');
+            toast.classList.add('opacity-100', 'translate-y-0');
+            window.playThwipSound();
+            
+            setTimeout(() => {
+                toast.classList.remove('opacity-100', 'translate-y-0');
+                toast.classList.add('opacity-0', 'translate-y-[-20px]');
+            }, 4000);
+        };
+    </script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Spidey Facts Logic
+            const spideyFacts = [
+                { type: "Love Lesson", text: "Tu mera rasta hai. Aur is file ki tarah, tu mere dil me heavily encrypted hai." },
+                { type: "Fun Fact", text: "Main New York me swing karne ke liye web-shooters use karta hu, par secure file share karne ke liye SpiddyWeb!" },
+                { type: "Love Lesson", text: "Kuch cheezein 24 ghante me self-destruct hone ke liye banti hain, par mera pyaar unme se nahi hai." },
+                { type: "Life Lesson", text: "Badi file sizes ke saath, badi upload speed aati hai. - Uncle Ben (shayad)" },
+                { type: "Love Lesson", text: "Face it Tiger, teri lottery lag gayi! (Aur teri file bhi upload ho gayi) - MJ" },
+                { type: "Web Lesson", text: "Mera Spider-Sense tingle kar raha hai... Oh wait, ye toh bas file download complete hua hai." },
+                { type: "Love Lesson", text: "Main poore shehar ko bacha sakta hu, par teri files sirf ek secure PIN bacha sakti hai." },
+                { type: "Life Lesson", text: "Mask koi bhi pehan sakta hai. Aur 2GB tak ki file koi bhi share kar sakta hai." },
+                { type: "Love Lesson", text: "Tujhe is file ka PIN dene ke liye, main poora Multiverse travel kar sakta hu." },
+                { type: "Web Lesson", text: "Meri secret identity se zyada safe tere secrets hain yaha. - Peter Parker" },
+                { type: "Love Lesson", text: "I love you guys! Almost utna hi jitna mujhe fast upload progress bar pasand hai." },
+                { type: "Web Lesson", text: "Hum wahi hain jo hum chunte hain. Files securely share karna chuno." },
+                { type: "Love Lesson", text: "Tu samundar ki koi aam boond nahi, tu akela Spiddy Drop hai jiski mujhe fikar hai." },
+                { type: "Fun Fact", text: "Tony Stark ko mera suit banane me millions lag gaye, par SpiddyWeb 2GB files bilkul free me sambhalta hai." },
+                { type: "Love Lesson", text: "Jab hamari files web ke through connected hain, toh doori (distance) ka koi matlab nahi." },
+                { type: "Life Lesson", text: "Kabhi kabhi sahi karne ke liye, hamein chizzein chhodni padti hain... jaise is file ko 24 ghante me expire hone dena." },
+                { type: "Web Lesson", text: "Bilkul Symbiote ki tarah, ye file deeply attached hai... jab tak timer khatam nahi hota." },
+                { type: "Love Lesson", text: "Mere pyaar ke jaal me fasne ke liye tujhe kisi radioactive makdi ki zarurat nahi hai." },
+                { type: "Web Lesson", text: "Ek accha relationship ek perfect file drop jaisa hota hai—fast, secure, aur sirf do logo ke beech." },
+                { type: "Love Lesson", text: "Agar main toot'te hue ferry jahaz ko jod ke rakh sakta hu, toh 24 ghante tak hamari files bhi sambhal lunga." }
+            ];
+
+            const bubble = document.getElementById('spideyFactBubble');
+            const typeEl = document.getElementById('spideyFactType');
+            const textEl = document.getElementById('spideyFactText');
+            let factIndex = Math.floor(Math.random() * spideyFacts.length);
+
+            function showNextFact() {
+                factIndex = (factIndex + 1) % spideyFacts.length;
+                const fact = spideyFacts[factIndex];
+                
+                typeEl.textContent = fact.type;
+                textEl.textContent = fact.text;
+
+                // Anchored to bottom-right corner (never overlaps center content)
+                bubble.style.bottom = '24px';
+                bubble.style.right = '24px';
+                bubble.style.left = 'auto';
+                bubble.style.top = 'auto';
+                
+                if (window.gsap) {
+                    gsap.fromTo(bubble, 
+                        { opacity: 0, scale: 0.8, y: 30 }, 
+                        { opacity: 1, scale: 1, y: 0, duration: 0.4, ease: 'back.out(1.8)' }
+                    );
+
+                    setTimeout(() => {
+                        gsap.to(bubble, { opacity: 0, scale: 0.8, y: 20, duration: 0.3, ease: 'power2.in' });
+                    }, 8000);
+                } else {
+                    bubble.style.opacity = 1;
+                    setTimeout(() => { bubble.style.opacity = 0; }, 8000);
+                }
+            }
+
+            // Start immediately, then loop every 12 seconds
+            setTimeout(() => {
+                showNextFact();
+                setInterval(showNextFact, 12000);
+            }, 1000);
+
+            // CTA Button Hover Popups
+            const ctaPopup = document.getElementById('ctaPopup');
+            const ctaPopupText = document.getElementById('ctaPopupText');
+            
+            document.querySelectorAll('.cta-btn').forEach(btn => {
+                btn.addEventListener('mouseenter', (e) => {
+                    const msg = btn.getAttribute('data-spidey-msg');
+                    if(msg) {
+                        ctaPopupText.textContent = msg;
+                        const rect = btn.getBoundingClientRect();
+                        ctaPopup.style.left = (rect.left + rect.width / 2) + 'px';
+                        ctaPopup.style.top = rect.top + 'px';
+                        ctaPopup.style.opacity = '1';
+                        
+                        if(window.gsap) {
+                            gsap.fromTo(ctaPopup, { y: 10, scale: 0.8 }, { y: 0, scale: 1, duration: 0.2, ease: 'back.out(2)' });
+                        }
+                    }
+                });
+                
+                btn.addEventListener('mouseleave', () => {
+                    ctaPopup.style.opacity = '0';
+                });
+            });
+            if (window.gsap) {
+                if (window.ScrollTrigger) {
+                    gsap.registerPlugin(ScrollTrigger);
+                }
+
+                // New: Spider Pendulum Animation
+                const pendulum = document.getElementById('pendulumPivot');
+                const webLine = document.getElementById('spiderWebLine');
+                const spider = document.getElementById('spiderEmoji');
+                
+                if (pendulum && webLine && spider) {
+                    const tl = gsap.timeline();
+                    // Drop down
+                    tl.to(spider, { opacity: 1, duration: 0.1 })
+                      .to(webLine, { height: '180px', duration: 1.5, ease: "bounce.out" })
+                      // Swing back and forth
+                      .to(pendulum, { rotation: 25, duration: 0.8, ease: "power1.inOut" })
+                      .to(pendulum, { rotation: -20, duration: 0.8, ease: "power1.inOut" })
+                      .to(pendulum, { rotation: 10, duration: 0.7, ease: "power1.inOut" })
+                      .to(pendulum, { rotation: -5, duration: 0.6, ease: "power1.inOut" })
+                      .to(pendulum, { rotation: 0, duration: 0.5, ease: "power1.inOut" })
+                      // Pull back up
+                      .to(webLine, { height: '0px', duration: 0.8, ease: "power2.in", delay: 1 })
+                      .to(spider, { opacity: 0, duration: 0.2 }, "-=0.2");
+                }
+
+                // Reveal Animations
+                gsap.utils.toArray('[data-reveal]').forEach(elem => {
+                    if (window.ScrollTrigger) {
+                        gsap.fromTo(elem, 
+                            { opacity: 0, y: 40 },
+                            { opacity: 1, y: 0, duration: 1, ease: "power3.out", scrollTrigger: { trigger: elem, start: "top 90%" } }
+                        );
+                    } else {
+                        gsap.to(elem, { opacity: 1, y: 0, duration: 0.6 });
+                    }
+                });
+
+                gsap.utils.toArray('[data-stagger-group]').forEach(group => {
+                    const cards = group.querySelectorAll('[data-page-card], > *');
+                    if (window.ScrollTrigger) {
+                        gsap.fromTo(cards, 
+                            { opacity: 0, y: 60, scale: 0.95 },
+                            { opacity: 1, y: 0, scale: 1, duration: 0.8, stagger: 0.15, ease: "back.out(1.5)", scrollTrigger: { trigger: group, start: "top 85%" } }
+                        );
+                    } else {
+                        gsap.to(cards, { opacity: 1, y: 0, scale: 1, duration: 0.6, stagger: 0.1 });
+                    }
+                });
+
+                const heroElements = document.querySelectorAll('[data-page-hero] [data-reveal]');
+                if (heroElements.length > 0) {
+                    gsap.fromTo(heroElements, 
+                        { opacity: 0, y: 30 },
+                        { opacity: 1, y: 0, duration: 0.8, stagger: 0.1, ease: "power3.out" }
+                    );
+                }
+
+
+
+
+
+                document.querySelectorAll('.web-panel').forEach((panel) => {
+                    const shine = panel.querySelector('.shine-layer');
+                    panel.addEventListener('mouseenter', () => {
+                        gsap.to(panel, {
+                            boxShadow: '0 20px 40px rgba(226, 54, 54, 0.3), inset 0 0 16px rgba(81, 140, 202, 0.4)',
+                            duration: 0.28,
+                        });
+                        if (shine) {
+                            gsap.fromTo(shine, { x: '-135%' }, { x: '165%', duration: 0.9, ease: 'power2.out' });
+                        }
+                    });
+                    panel.addEventListener('mouseleave', () => {
+                        gsap.to(panel, {
+                            boxShadow: '0 0 20px rgba(226, 54, 54, 0.2), inset 0 0 10px rgba(81, 140, 202, 0.2)',
+                            duration: 0.28,
+                        });
+                    });
+                });
+            } else {
+                // Fallback: Reveal everything if GSAP is unavailable
+                document.querySelectorAll('[data-reveal], [data-stagger-group]>*').forEach(elem => {
+                    elem.style.opacity = '1';
+                });
+            }
+        });
+
+        // 🕷️ Canvas Spider-Web Cursor Tail FX
+        (function initWebCursorCanvas() {
+            const canvas = document.createElement('canvas');
+            canvas.id = 'spiderWebCanvas';
+            canvas.className = 'fixed inset-0 pointer-events-none z-[9995]';
+            document.body.appendChild(canvas);
+
+            const ctx = canvas.getContext('2d');
+            let points = [];
+            const maxPoints = 22;
+
+            function resize() {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+            }
+            resize();
+            window.addEventListener('resize', resize);
+
+            window.addEventListener('mousemove', (e) => {
+                points.push({
+                    x: e.clientX,
+                    y: e.clientY,
+                    vx: (Math.random() - 0.5) * 1.5,
+                    vy: (Math.random() - 0.5) * 1.5,
+                    age: 0
+                });
+                if (points.length > maxPoints) points.shift();
+            });
+
+            function render() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+                for (let i = 0; i < points.length; i++) {
+                    points[i].age += 1;
+                    points[i].x += points[i].vx * 0.2;
+                    points[i].y += points[i].vy * 0.2;
+                }
+
+                points = points.filter(p => p.age < 35);
+
+                for (let i = 0; i < points.length; i++) {
+                    const p1 = points[i];
+                    const alpha = 1 - (p1.age / 35);
+
+                    // Draw connecting web strands
+                    for (let j = i + 1; j < points.length; j++) {
+                        const p2 = points[j];
+                        const dist = Math.hypot(p2.x - p1.x, p2.y - p1.y);
+                        if (dist < 140) {
+                            ctx.beginPath();
+                            ctx.moveTo(p1.x, p1.y);
+                            ctx.lineTo(p2.x, p2.y);
+                            const webAlpha = alpha * (1 - dist / 140) * 0.45;
+                            ctx.strokeStyle = i % 2 === 0 ? `rgba(226, 54, 54, ${webAlpha})` : `rgba(81, 140, 202, ${webAlpha})`;
+                            ctx.lineWidth = 1;
+                            ctx.stroke();
+                        }
+                    }
+
+                    // Draw web node glowing dot
+                    ctx.beginPath();
+                    ctx.arc(p1.x, p1.y, Math.max(1, 2.5 * alpha), 0, Math.PI * 2);
+                    ctx.fillStyle = i % 2 === 0 ? `rgba(226, 54, 54, ${alpha * 0.8})` : `rgba(81, 140, 202, ${alpha * 0.8})`;
+                    ctx.shadowColor = i % 2 === 0 ? '#E23636' : '#518CCA';
+                    ctx.shadowBlur = 8;
+                    ctx.fill();
+                    ctx.shadowBlur = 0;
+                }
+
+                requestAnimationFrame(render);
+            }
+            render();
+        })();
+    </script>
+    {% block page_scripts %}{% endblock %}
+
+</body>
+
+</html>

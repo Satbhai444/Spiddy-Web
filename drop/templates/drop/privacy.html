@@ -1,0 +1,111 @@
+{% extends 'drop/base.html' %}
+
+{% block main_class %}w-full max-w-2xl{% endblock %}
+
+{% block content %}
+<div class="spidey-card p-8 mb-12">
+
+    <h2 class="text-3xl spidey-title text-white mb-1">Privacy Policy</h2>
+    <p class="text-gray-600 text-xs mb-8 uppercase tracking-widest">Last updated: August 2026</p>
+
+    <div class="space-y-8 text-gray-300 text-sm leading-relaxed">
+
+        <section>
+            <h3 class="text-white font-bold text-base mb-2 flex items-center gap-2">
+                <span class="text-red-400">01.</span> What is SpiddyWeb?
+            </h3>
+            <p>SpiddyWeb is a free, anonymous temporary file-sharing service. You upload a file, get a 6-digit PIN,
+                share that PIN with someone — they download the file. That's it. No accounts, no profiles, no history.
+            </p>
+        </section>
+
+        <section>
+            <h3 class="text-white font-bold text-base mb-2 flex items-center gap-2">
+                <span class="text-red-400">02.</span> What data do we collect?
+            </h3>
+            <p class="mb-3">We collect as little as possible:</p>
+            <ul class="space-y-2 ml-4">
+                <li class="flex items-start gap-2"><span class="text-blue-400 mt-0.5">→</span> <span><strong
+                            class="text-white">The file you upload</strong> — stored temporarily on our server,
+                        automatically deleted after 24 hours.</span></li>
+                <li class="flex items-start gap-2"><span class="text-blue-400 mt-0.5">→</span> <span><strong
+                            class="text-white">Upload timestamp</strong> — so we know when to delete the file.</span>
+                </li>
+                <li class="flex items-start gap-2"><span class="text-blue-400 mt-0.5">→</span> <span><strong
+                            class="text-white">CSRF token (session cookie)</strong> — a standard Django security
+                        mechanism to protect form submissions. It stores no personal information and expires when you
+                        close your browser.</span></li>
+            </ul>
+            <p class="mt-3">We do <strong class="text-white">not</strong> collect: your name, email, IP address, device
+                info, location, or any account data.</p>
+        </section>
+
+        <section>
+            <h3 class="text-white font-bold text-base mb-2 flex items-center gap-2">
+                <span class="text-red-400">03.</span> How are files stored?
+            </h3>
+            <p>Uploaded files are stored on the server disk under a randomly named path. They are <strong
+                    class="text-white">not encrypted at rest</strong>. After 24 hours from upload, the file is
+                permanently deleted from disk and our database. There is no backup or recovery after deletion.</p>
+        </section>
+
+        <section>
+            <h3 class="text-white font-bold text-base mb-2 flex items-center gap-2">
+                <span class="text-red-400">04.</span> Who can access my file?
+            </h3>
+            <p>Anyone who knows the 6-digit PIN can download your file within the 24-hour window. PINs are randomly
+                generated and not guessable by normal means. Do not share your PIN publicly or with people you don't
+                trust.</p>
+        </section>
+
+        <section>
+            <h3 class="text-white font-bold text-base mb-2 flex items-center gap-2">
+                <span class="text-red-400">05.</span> Do we use cookies or tracking?
+            </h3>
+            <p>No analytics. No advertising cookies. No third-party trackers. The only cookie set is Django's CSRF
+                cookie — a security token required for form submissions. It contains no personal information.</p>
+        </section>
+
+        <section>
+            <h3 class="text-white font-bold text-base mb-2 flex items-center gap-2">
+                <span class="text-red-400">06.</span> Do we share data with third parties?
+            </h3>
+            <p>No. We do not sell, trade, or share any data with third parties. Your file exists only on this server and
+                is deleted after 24 hours.</p>
+        </section>
+
+        <section>
+            <h3 class="text-white font-bold text-base mb-2 flex items-center gap-2">
+                <span class="text-red-400">07.</span> What files are NOT allowed?
+            </h3>
+            <p class="mb-2">By using SpiddyWeb, you agree not to upload:</p>
+            <ul class="space-y-1 ml-4">
+                <li class="flex items-start gap-2"><span class="text-red-400">✕</span> Malware, viruses, or any
+                    executable designed to cause harm</li>
+                <li class="flex items-start gap-2"><span class="text-red-400">✕</span> Copyrighted material you do not
+                    have the right to distribute</li>
+                <li class="flex items-start gap-2"><span class="text-red-400">✕</span> Illegal content of any kind</li>
+                <li class="flex items-start gap-2"><span class="text-red-400">✕</span> Personal data of others without
+                    their consent</li>
+            </ul>
+            <p class="mt-3">Misuse may result in content removal. This is a tool built for honest, quick file sharing —
+                use it responsibly.</p>
+        </section>
+
+        <section>
+            <h3 class="text-white font-bold text-base mb-2 flex items-center gap-2">
+                <span class="text-red-400">08.</span> Data retention
+            </h3>
+            <p>All uploaded files are automatically and permanently deleted <strong class="text-white">24 hours after
+                    upload</strong>. We do not archive, backup, or retain files beyond this period.</p>
+        </section>
+
+        <section class="border-t border-gray-800 pt-6">
+            <p class="text-gray-500 text-xs">SpiddyWeb is a free tool. It is provided as-is, without warranties of any
+                kind. Use at your own discretion. <span class="text-gray-600">— With great power comes great
+                    responsibility.</span></p>
+        </section>
+
+    </div>
+</div>
+{% endblock %}

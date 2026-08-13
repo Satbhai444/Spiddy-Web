@@ -1,0 +1,31 @@
+{% extends 'drop/base.html' %}
+
+{% block main_class %}w-full max-w-2xl px-4{% endblock %}
+
+{% block content %}
+<div class="pt-24 pb-16 text-center">
+    <div class="spidey-card web-panel p-10 relative overflow-hidden" data-reveal>
+        <div class="shine-layer"></div>
+        <div class="text-8xl mb-4 animate-bounce" style="filter:drop-shadow(0 0 25px rgba(226,54,54,0.6));">🕷️🌀</div>
+        <h1 class="spidey-title text-6xl text-white mb-2" style="text-shadow: 3px 3px 0px #E23636, -3px -3px 0px #518CCA;">
+            404 — LOST IN THE MULTIVERSE!
+        </h1>
+        <p class="text-xl text-gray-300 mb-6 font-semibold">
+            Looks like this page got snapped out of existence or lost in another dimension!
+        </p>
+        
+        <div class="bg-gray-900 border border-red-500/50 rounded-xl p-4 mb-8 text-sm text-gray-400 max-w-md mx-auto italic">
+            "My Spider-Sense tingle kar raha hai... Par yahan koi page nahi hai buddy! Double check the URL or swing back to home."
+        </div>
+
+        <div class="flex flex-col sm:flex-row gap-4 justify-center">
+            <a href="{% url 'home' %}" class="btn-red text-white font-bold py-3.5 px-8 rounded-xl uppercase tracking-wider text-sm">
+                🏠 Back to Home Web
+            </a>
+            <a href="{% url 'upload' %}" class="btn-blue text-white font-bold py-3.5 px-8 rounded-xl uppercase tracking-wider text-sm">
+                📤 Shoot a New Web
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,95 @@
+{% extends 'drop/base.html' %}
+
+{% block main_class %}w-full max-w-4xl px-4{% endblock %}
+
+{% block content %}
+<div class="pt-24 pb-16">
+    <div class="text-center mb-12" data-reveal>
+        <h1 class="spidey-title text-5xl text-white mb-3">SPIDDYWEB DOCUMENTATION</h1>
+        <p class="text-gray-400 uppercase tracking-widest text-xs font-bold">API Reference, User Guide &amp; Security Specs</p>
+    </div>
+
+    <!-- Navigation Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-10" data-stagger-group>
+        <a href="#user-guide" class="spidey-card web-panel p-5 hover:border-red-500 transition-colors">
+            <div class="text-3xl mb-2">🚀</div>
+            <h3 class="font-bold text-white mb-1">User Guide</h3>
+            <p class="text-gray-400 text-xs">How to upload, share PINs, and download files.</p>
+        </a>
+        <a href="#api-reference" class="spidey-card web-panel p-5 hover:border-blue-500 transition-colors">
+            <div class="text-3xl mb-2">⚡</div>
+            <h3 class="font-bold text-white mb-1">API Reference</h3>
+            <p class="text-gray-400 text-xs">REST API endpoints for chunked file drops.</p>
+        </a>
+        <a href="#security-specs" class="spidey-card web-panel p-5 hover:border-green-500 transition-colors">
+            <div class="text-3xl mb-2">🛡️</div>
+            <h3 class="font-bold text-white mb-1">Security Specs</h3>
+            <p class="text-gray-400 text-xs">Encryption, self-destruct timers &amp; rate limits.</p>
+        </a>
+    </div>
+
+    <!-- Section 1: User Guide -->
+    <div id="user-guide" class="spidey-card p-8 mb-8 space-y-4" data-reveal>
+        <h2 class="text-2xl font-bold text-white border-b border-gray-800 pb-3 flex items-center gap-2">
+            <span>🚀</span> User Guide &amp; Features
+        </h2>
+        <div class="space-y-3 text-sm text-gray-300">
+            <p><strong class="text-red-400">1. Uploading Files:</strong> Select single or multiple files (up to 2GB total) or drag &amp; drop them into the Web Drop Zone. Multiple files are automatically bundled into a single ZIP drop.</p>
+            <p><strong class="text-blue-400">2. PIN &amp; QR Sharing:</strong> Every upload generates a unique 6-digit PIN and direct share link + mobile QR code.</p>
+            <p><strong class="text-yellow-400">3. Passcode Protection:</strong> Optionally set a secret password during upload for extra security.</p>
+            <p><strong class="text-green-400">4. Auto Self-Destruct:</strong> Choose auto-expiry (1hr, 6hr, 24hr, 7 days) or One-Time Download mode (deletes immediately after first retrieval).</p>
+        </div>
+    </div>
+
+    <!-- Section 2: API Reference -->
+    <div id="api-reference" class="spidey-card p-8 mb-8 space-y-4" data-reveal>
+        <h2 class="text-2xl font-bold text-white border-b border-gray-800 pb-3 flex items-center gap-2">
+            <span>⚡</span> REST API Reference
+        </h2>
+        <div class="space-y-4 text-xs font-mono">
+            <div class="bg-gray-900 border border-gray-800 rounded-lg p-4">
+                <div class="text-green-400 font-bold mb-1">POST /upload/</div>
+                <div class="text-gray-400 mb-2">Form Data: <code>file</code>, <code>filename</code>, <code>chunk_index</code>, <code>total_chunks</code>, <code>upload_id</code>, <code>expires_hours</code>, <code>password</code> (optional)</div>
+                <div class="text-gray-500">Initiates or appends a 2MB chunk to a File Drop. Returns JSON success with PIN on last chunk.</div>
+            </div>
+
+            <div class="bg-gray-900 border border-gray-800 rounded-lg p-4">
+                <div class="text-blue-400 font-bold mb-1">POST /receive/</div>
+                <div class="text-gray-400 mb-2">Form Data: <code>pin</code>, <code>password</code> (optional)</div>
+                <div class="text-gray-500">Validates PIN &amp; password, returning file metadata, download count, and remaining expiry milliseconds.</div>
+            </div>
+
+            <div class="bg-gray-900 border border-gray-800 rounded-lg p-4">
+                <div class="text-yellow-400 font-bold mb-1">GET /file/{pin}/download/</div>
+                <div class="text-gray-400 mb-2">Query Params: <code>password</code> (optional)</div>
+                <div class="text-gray-500">Streams raw file binary attachment. Increments download counter and purges file if One-Time mode is active.</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Section 3: Security & Limits -->
+    <div id="security-specs" class="spidey-card p-8 mb-8 space-y-4" data-reveal>
+        <h2 class="text-2xl font-bold text-white border-b border-gray-800 pb-3 flex items-center gap-2">
+            <span>🛡️</span> Security &amp; Limits
+        </h2>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm text-gray-300">
+            <div class="bg-gray-900 p-4 rounded-lg border border-gray-800">
+                <div class="text-red-400 font-bold mb-1">Max File Limit</div>
+                <div>2 GB per drop. Chunked JS streaming prevents memory crashes.</div>
+            </div>
+            <div class="bg-gray-900 p-4 rounded-lg border border-gray-800">
+                <div class="text-blue-400 font-bold mb-1">Bandwidth Limit</div>
+                <div>5 GB per IP per hour &amp; 10 uploads per hour max.</div>
+            </div>
+            <div class="bg-gray-900 p-4 rounded-lg border border-gray-800">
+                <div class="text-yellow-400 font-bold mb-1">Brute Force Protection</div>
+                <div>5 failed PIN attempts trigger 15-minute IP lockout.</div>
+            </div>
+            <div class="bg-gray-900 p-4 rounded-lg border border-gray-800">
+                <div class="text-green-400 font-bold mb-1">Extension Blacklist</div>
+                <div>Executable and script files (.exe, .bat, .sh, .vbs) are blocked.</div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

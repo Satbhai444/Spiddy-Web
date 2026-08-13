@@ -1,0 +1,90 @@
+{% extends 'drop/base.html' %}
+
+{% block content %}
+<div class="spidey-card web-panel p-8 text-center" data-page-hero data-page-card>
+    <div class="shine-layer"></div>
+    <div class="w-16 h-16 mx-auto bg-green-500 rounded-full flex items-center justify-center mb-6 shadow-[0_0_15px_rgba(34,197,94,0.5)]"
+        data-reveal data-parallax="12">
+        <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path>
+        </svg>
+    </div>
+    <h2 class="text-2xl font-bold mb-2 text-white" data-reveal>File Uploaded!</h2>
+    <p class="text-gray-400 mb-2" data-reveal>Your web is set. Share this secret PIN:</p>
+    <p class="text-white font-semibold mb-6 break-all" data-reveal>{{ filename }}</p>
+
+    <div class="bg-gray-900 border border-gray-700 rounded-lg p-6 mb-5" data-reveal>
+        <span class="text-5xl font-mono font-bold tracking-[0.25em] text-blue-400 ml-2"
+            style="text-shadow: 0 0 10px rgba(81,140,202,0.5);">{{ pin }}</span>
+    </div>
+
+    <button id="copyPinBtn"
+        class="w-full mb-3 btn-blue text-white font-bold py-3 px-4 rounded-lg uppercase tracking-wider cta-btn" data-spidey-msg="PIN copy kar liya! Ab dost ko bhej de." data-reveal>
+        Copy PIN
+    </button>
+
+    <div class="bg-gray-900 border border-gray-700 rounded-lg p-4 mb-3 text-left" data-reveal>
+        <div class="text-xs uppercase tracking-widest text-gray-500 mb-2">Direct Share Link</div>
+        <div id="shareUrl" class="text-sm text-blue-300 break-all mb-3">{{ share_url }}</div>
+        <button id="copyLinkBtn"
+            class="btn-red text-white font-bold py-2 px-4 rounded-lg uppercase tracking-wider text-sm w-full cta-btn" data-spidey-msg="Link copy ho gaya! Web swing incoming.">Copy Share Link</button>
+    </div>
+
+    <div class="bg-white rounded-xl p-4 inline-block mb-5" data-reveal>
+        <div id="qrCode"></div>
+    </div>
+
+    <div class="text-xs text-gray-400 mb-5" data-reveal>
+        Expiry: {{ expires_hours }} hour{{ expires_hours|pluralize }}{% if one_time %} &nbsp;&middot;&nbsp; One-time
+        download enabled{% endif %}
+    </div>
+
+    <div class="bg-gray-900 border border-gray-800 rounded-lg px-5 py-3 mb-6 inline-flex items-center gap-3"
+        data-reveal>
+        <span class="text-gray-500 text-xs uppercase tracking-widest">Self-destructs in</span>
+        <span class="text-red-400 font-mono font-bold text-xl" id="countdown">00:00:00</span>
+    </div>
+
+    <a href="{% url 'upload' %}"
+        class="block w-full btn-blue text-white font-bold py-3 px-4 rounded-lg uppercase tracking-wider cta-btn" data-spidey-msg="Ek aur file? Spidey is ready!" data-reveal>
+        Upload Another
+    </a>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script>
+    let totalSeconds = {{ expires_hours }} * 3600;
+    const el = document.getElementById('countdown');
+    const shareUrl = document.getElementById('shareUrl').textContent.trim();
+    function tick() {
+        if (totalSeconds <= 0) { el.textContent = '00:00:00'; return; }
+        const h = Math.floor(totalSeconds / 3600);
+        const m = Math.floor((totalSeconds % 3600) / 60);
+        const s = totalSeconds % 60;
+        el.textContent = `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+        totalSeconds--;
+    }
+    tick();
+    setInterval(tick, 1000);
+
+    new QRCode(document.getElementById('qrCode'), {
+        text: shareUrl,
+        width: 170,
+        height: 170,
+    });
+
+    async function copyText(text, button, okText) {
+        await navigator.clipboard.writeText(text);
+        const original = button.textContent;
+        button.textContent = okText;
+        setTimeout(() => { button.textContent = original; }, 1600);
+    }
+
+    if (window.showSpiderSenseToast) {
+        window.showSpiderSenseToast("File Uploaded! Share PIN {{ pin }} or QR Code", "SPIDDY DROP");
+    }
+
+    document.getElementById('copyPinBtn').addEventListener('click', () => copyText('{{ pin }}', document.getElementById('copyPinBtn'), 'PIN Copied'));
+    document.getElementById('copyLinkBtn').addEventListener('click', () => copyText(shareUrl, document.getElementById('copyLinkBtn'), 'Link Copied'));
+</script>
+{% endblock %}

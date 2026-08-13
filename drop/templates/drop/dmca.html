@@ -1,0 +1,77 @@
+{% extends 'drop/base.html' %}
+
+{% block main_class %}w-full max-w-2xl{% endblock %}
+
+{% block content %}
+<div class="spidey-card p-8 mb-12">
+
+    <h2 class="text-3xl spidey-title text-white mb-1">DMCA Policy</h2>
+    <p class="text-gray-600 text-xs mb-8 uppercase tracking-widest">Digital Millennium Copyright Act — Last updated:
+        August 2026</p>
+
+    <div class="space-y-8 text-gray-300 text-sm leading-relaxed">
+
+        <section>
+            <h3 class="text-white font-bold text-base mb-2 flex items-center gap-2">
+                <span class="text-red-400">01.</span> Our stance on copyright
+            </h3>
+            <p>SpiddyWeb respects intellectual property rights. We take copyright infringement seriously. All uploaded
+                files auto-delete within 24 hours, but if you believe your copyrighted work has been shared without your
+                permission, you can request immediate removal.</p>
+        </section>
+
+        <section>
+            <h3 class="text-white font-bold text-base mb-2 flex items-center gap-2">
+                <span class="text-red-400">02.</span> How to file a DMCA takedown
+            </h3>
+            <p class="mb-3">To request removal of infringing content, provide the following information:</p>
+            <ul class="space-y-2 ml-4">
+                <li class="flex items-start gap-2"><span class="text-blue-400 mt-0.5">→</span> Your full name and
+                    contact information (email, address)</li>
+                <li class="flex items-start gap-2"><span class="text-blue-400 mt-0.5">→</span> Description of the
+                    copyrighted work you believe is being infringed</li>
+                <li class="flex items-start gap-2"><span class="text-blue-400 mt-0.5">→</span> The 6-digit PIN or URL of
+                    the infringing file on SpiddyWeb</li>
+                <li class="flex items-start gap-2"><span class="text-blue-400 mt-0.5">→</span> A statement that you have
+                    a good-faith belief that the use is not authorized by the copyright owner</li>
+                <li class="flex items-start gap-2"><span class="text-blue-400 mt-0.5">→</span> A statement that the
+                    information in your notice is accurate, under penalty of perjury</li>
+                <li class="flex items-start gap-2"><span class="text-blue-400 mt-0.5">→</span> Your physical or
+                    electronic signature</li>
+            </ul>
+        </section>
+
+        <section>
+            <h3 class="text-white font-bold text-base mb-2 flex items-center gap-2">
+                <span class="text-red-400">03.</span> What happens after a takedown request
+            </h3>
+            <p>Upon receiving a valid DMCA notice, we will promptly remove the identified content. Given SpiddyWeb's
+                24-hour auto-deletion policy, most infringing content will already be gone by the time a notice is
+                processed.</p>
+        </section>
+
+        <section>
+            <h3 class="text-white font-bold text-base mb-2 flex items-center gap-2">
+                <span class="text-red-400">04.</span> Counter-notification
+            </h3>
+            <p>If you believe your content was removed in error, you may file a counter-notification.
+                Counter-notifications must include your contact information, identification of the removed content, a
+                statement under penalty of perjury that removal was a mistake, and your consent to jurisdiction.</p>
+        </section>
+
+        <section>
+            <h3 class="text-white font-bold text-base mb-2 flex items-center gap-2">
+                <span class="text-red-400">05.</span> Abuse of DMCA process
+            </h3>
+            <p>Filing a DMCA takedown notice for content that does not infringe your copyright — or that you do not own
+                — is a legal violation. Misuse of this process may expose you to liability under 17 U.S.C. § 512(f).</p>
+        </section>
+
+        <section class="border-t border-gray-800 pt-6">
+            <p class="text-gray-500 text-xs">SpiddyWeb automatically deletes all files after 24 hours. Most copyright
+                concerns will resolve themselves within that window. For urgent matters, file a notice immediately.</p>
+        </section>
+
+    </div>
+</div>
+{% endblock %}

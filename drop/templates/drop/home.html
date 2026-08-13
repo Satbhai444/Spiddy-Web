@@ -1,0 +1,220 @@
+{% extends 'drop/base.html' %}
+
+{% block main_class %}w-full max-w-5xl px-4{% endblock %}
+
+{% block header %}
+<nav class="fixed top-0 left-0 right-0 z-50 px-6 py-3 flex items-center justify-between" data-reveal="header"
+    style="background:rgba(15,15,19,0.92); backdrop-filter:blur(12px); border-bottom:1px solid rgba(81,140,202,0.2);">
+    <span class="spidey-title text-3xl text-white tracking-wide">SPIDDY</span>
+    <div class="flex gap-3">
+        <a href="{% url 'upload' %}"
+            class="btn-red text-white text-xs font-bold py-2 px-5 rounded-lg uppercase tracking-wider cta-btn" data-spidey-msg="Jaala fek aur file share kar!">Upload</a>
+        <a href="{% url 'download' %}"
+            class="btn-blue text-white text-xs font-bold py-2 px-5 rounded-lg uppercase tracking-wider cta-btn" data-spidey-msg="Swing kar aur file pakad!">Download</a>
+    </div>
+</nav>
+{% endblock %}
+
+{% block content %}
+
+<!-- Hero -->
+<div class="text-center pt-36 pb-20" data-page-hero>
+    <div class="text-7xl mb-6 inline-block" data-reveal
+        style="filter:drop-shadow(0 0 24px rgba(226,54,54,0.6));">🕷️
+    </div>
+    <h1 class="spidey-title mb-6 leading-none tracking-wide" data-reveal style="font-size:clamp(3.5rem,10vw,5.5rem); font-style:italic;">
+        <span style="color:#ffffff; text-shadow: 4px 4px 0px #dc2626, -2px -2px 0px #2563eb, 6px 6px 12px rgba(0,0,0,0.9);">SPIDDY</span> 
+        <span style="color:#E23636; text-shadow: -2px -2px 0px #ffffff, 3px 3px 0px #2563eb, 5px 5px 12px rgba(0,0,0,0.9);">WEB</span> 
+        <span style="color:#ffffff; text-shadow: 4px 4px 0px #dc2626, -2px -2px 0px #2563eb, 6px 6px 12px rgba(0,0,0,0.9);">DROP</span>
+    </h1>
+    <p class="text-xl text-gray-200 mb-1 max-w-2xl mx-auto font-medium" data-reveal>
+        Share files instantly with a secret PIN.
+    </p>
+    <p class="text-xl text-gray-200 mb-4 max-w-2xl mx-auto font-medium" data-reveal>
+        No account. No trace. <span class="text-red-500 font-bold">Self-destructs in 24 hours.</span>
+    </p>
+    <p class="text-sm text-gray-400 mb-12 italic tracking-wide" data-reveal>"With great power comes great file sharing."</p>
+
+    <div class="flex flex-col sm:flex-row gap-4 justify-center" data-reveal>
+        <a href="{% url 'upload' %}"
+            class="btn-red text-white font-bold py-4 px-12 rounded-xl text-lg uppercase tracking-widest cta-btn" data-spidey-msg="Badi files? Spidey sambhal lega!">
+            🕸️ Shoot a Web
+        </a>
+        <a href="{% url 'download' %}"
+            class="btn-blue text-white font-bold py-4 px-12 rounded-xl text-lg uppercase tracking-widest cta-btn" data-spidey-msg="PIN daal aur magic dekh!">
+            🎯 Catch a Web
+        </a>
+    </div>
+
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 max-w-3xl mx-auto mt-12 text-left" data-stagger-group>
+        <div class="spidey-card web-panel p-5" data-page-card>
+            <div class="shine-layer"></div>
+            <div class="text-xs uppercase tracking-widest text-gray-500 mb-1">Active Drops</div>
+            <div class="text-3xl font-extrabold text-white">{{ stats.active_files }}</div>
+        </div>
+        <div class="spidey-card web-panel p-5" data-page-card>
+            <div class="shine-layer"></div>
+            <div class="text-xs uppercase tracking-widest text-gray-500 mb-1">Total Drops</div>
+            <div class="text-3xl font-extrabold text-white">{{ stats.total_files }}</div>
+        </div>
+        <div class="spidey-card web-panel p-5" data-page-card>
+            <div class="shine-layer"></div>
+            <div class="text-xs uppercase tracking-widest text-gray-500 mb-1">Data Shared</div>
+            <div class="text-3xl font-extrabold text-white">{{ stats.total_shared }}</div>
+        </div>
+    </div>
+</div>
+
+<!-- Divider -->
+<div class="text-center text-gray-700 text-2xl mb-16 tracking-[1rem]">· · · · · · ·</div>
+
+<!-- How It Works -->
+<div class="pb-20">
+    <h2 class="text-4xl md:text-5xl spidey-title text-center text-white mb-2" data-reveal>How It Works</h2>
+    <p class="text-center text-gray-500 mb-12 text-sm uppercase tracking-widest" data-reveal>Simple as swinging through
+        Manhattan
+    </p>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6" data-stagger-group>
+        <div class="spidey-card web-panel p-8 text-center relative overflow-hidden" data-page-card>
+            <div class="shine-layer"></div>
+            <div class="absolute top-3 right-4 text-7xl font-black opacity-5 spidey-title" style="color:#E23636;">01
+            </div>
+            <div class="text-5xl mb-5">📤</div>
+            <div class="text-xs font-bold text-red-400 uppercase tracking-widest mb-2">Step 1</div>
+            <h3 class="text-xl font-bold text-white mb-3">Upload Any File</h3>
+            <p class="text-gray-400 text-sm leading-relaxed">Pick any file up to 2GB. SpiddyWeb wraps it in a web and
+                locks it with a unique PIN.</p>
+        </div>
+        <div class="spidey-card web-panel p-8 text-center relative overflow-hidden" data-page-card>
+            <div class="shine-layer"></div>
+            <div class="absolute top-3 right-4 text-7xl font-black opacity-5 spidey-title" style="color:#518CCA;">02
+            </div>
+            <div class="text-5xl mb-5">🔢</div>
+            <div class="text-xs font-bold text-blue-400 uppercase tracking-widest mb-2">Step 2</div>
+            <h3 class="text-xl font-bold text-white mb-3">Get a Secret PIN</h3>
+            <p class="text-gray-400 text-sm leading-relaxed">You get a 6-digit secret PIN. Share it via chat, text, or
+                just whisper it — however you like.</p>
+        </div>
+        <div class="spidey-card web-panel p-8 text-center relative overflow-hidden" data-page-card>
+            <div class="shine-layer"></div>
+            <div class="absolute top-3 right-4 text-7xl font-black opacity-5 spidey-title" style="color:#22c55e;">03
+            </div>
+            <div class="text-5xl mb-5">📥</div>
+            <div class="text-xs font-bold text-green-400 uppercase tracking-widest mb-2">Step 3</div>
+            <h3 class="text-xl font-bold text-white mb-3">Download & Done</h3>
+            <p class="text-gray-400 text-sm leading-relaxed">Recipient enters the PIN, gets the file instantly. No
+                login, no signup, no nonsense.</p>
+        </div>
+    </div>
+</div>
+
+<!-- Features Grid -->
+<div class="pb-20">
+    <h2 class="text-4xl md:text-5xl spidey-title text-center text-white mb-2" data-reveal>Why SpiddyWeb?</h2>
+    <p class="text-center text-gray-500 mb-12 text-sm uppercase tracking-widest" data-reveal>Everything you need,
+        nothing you don't
+    </p>
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4" data-stagger-group>
+        <div class="spidey-card web-panel p-6 flex items-start gap-4 hover:scale-[1.02] transition-transform cursor-default"
+            data-page-card>
+            <div class="shine-layer"></div>
+            <span class="text-3xl shrink-0">⏱️</span>
+            <div>
+                <h4 class="font-bold text-white mb-1">24-Hour Self-Destruct</h4>
+                <p class="text-gray-400 text-sm">Files vanish automatically. No storage bloat, no cleanup needed.</p>
+            </div>
+        </div>
+        <div class="spidey-card web-panel p-6 flex items-start gap-4 hover:scale-[1.02] transition-transform cursor-default"
+            data-page-card>
+            <div class="shine-layer"></div>
+            <span class="text-3xl shrink-0">🔑</span>
+            <div>
+                <h4 class="font-bold text-white mb-1">PIN Protected Access</h4>
+                <p class="text-gray-400 text-sm">Only the person with the 6-digit PIN can download your file.</p>
+            </div>
+        </div>
+        <div class="spidey-card web-panel p-6 flex items-start gap-4 hover:scale-[1.02] transition-transform cursor-default"
+            data-page-card>
+            <div class="shine-layer"></div>
+            <span class="text-3xl shrink-0">👤</span>
+            <div>
+                <h4 class="font-bold text-white mb-1">Fully Anonymous</h4>
+                <p class="text-gray-400 text-sm">No signup, no login, no tracking. Just upload and go.</p>
+            </div>
+        </div>
+        <div class="spidey-card web-panel p-6 flex items-start gap-4 hover:scale-[1.02] transition-transform cursor-default"
+            data-page-card>
+            <div class="shine-layer"></div>
+            <span class="text-3xl shrink-0">⚡</span>
+            <div>
+                <h4 class="font-bold text-white mb-1">Instant Transfers</h4>
+                <p class="text-gray-400 text-sm">Share files in seconds. No waiting, no compression, no fluff.</p>
+            </div>
+        </div>
+        <div class="spidey-card web-panel p-6 flex items-start gap-4 hover:scale-[1.02] transition-transform cursor-default"
+            data-page-card>
+            <div class="shine-layer"></div>
+            <span class="text-3xl shrink-0">📁</span>
+            <div>
+                <h4 class="font-bold text-white mb-1">Any File Type</h4>
+                <p class="text-gray-400 text-sm">Images, docs, zips, videos — anything up to 2GB works.</p>
+            </div>
+        </div>
+        <div class="spidey-card web-panel p-6 flex items-start gap-4 hover:scale-[1.02] transition-transform cursor-default"
+            data-page-card>
+            <div class="shine-layer"></div>
+            <span class="text-3xl shrink-0">🕷️</span>
+            <div>
+                <h4 class="font-bold text-white mb-1">Spidey Approved</h4>
+                <p class="text-gray-400 text-sm">Built for speed and simplicity. Peter Parker would be proud.</p>
+            </div>
+        </div>
+        <div class="spidey-card web-panel p-6 flex items-start gap-4 hover:scale-[1.02] transition-transform cursor-default"
+            data-page-card>
+            <div class="shine-layer"></div>
+            <span class="text-3xl shrink-0">🔗</span>
+            <div>
+                <h4 class="font-bold text-white mb-1">Direct Share Links</h4>
+                <p class="text-gray-400 text-sm">Every upload gets a PIN and a clean share link you can paste anywhere.
+                </p>
+            </div>
+        </div>
+        <div class="spidey-card web-panel p-6 flex items-start gap-4 hover:scale-[1.02] transition-transform cursor-default"
+            data-page-card>
+            <div class="shine-layer"></div>
+            <span class="text-3xl shrink-0">📱</span>
+            <div>
+                <h4 class="font-bold text-white mb-1">QR Quick Access</h4>
+                <p class="text-gray-400 text-sm">Open the file on another device instantly by scanning the generated QR
+                    code.</p>
+            </div>
+        </div>
+        <div class="spidey-card web-panel p-6 flex items-start gap-4 hover:scale-[1.02] transition-transform cursor-default"
+            data-page-card>
+            <div class="shine-layer"></div>
+            <span class="text-3xl shrink-0">🧨</span>
+            <div>
+                <h4 class="font-bold text-white mb-1">One-Time Mode</h4>
+                <p class="text-gray-400 text-sm">Need extra control? Make the file disappear right after the first
+                    download.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Bottom CTA -->
+<div class="pb-24 text-center">
+    <div class="spidey-card web-panel p-10 max-w-lg mx-auto" data-page-card>
+        <div class="shine-layer"></div>
+        <div class="text-6xl mb-4" data-reveal>🕸️</div>
+        <h3 class="text-3xl spidey-title text-white mb-3" data-reveal>Ready to Swing?</h3>
+        <p class="text-gray-400 mb-8" data-reveal>Shoot your first web and share a file in under 10 seconds.</p>
+        <a href="{% url 'upload' %}"
+            class="btn-red text-white font-bold py-3 px-10 rounded-xl text-lg uppercase tracking-widest inline-block cta-btn" data-spidey-msg="Free hai bhai, tension mat le!"
+            data-reveal>
+            Get Started — It's Free
+        </a>
+    </div>
+</div>
+
+{% endblock %}

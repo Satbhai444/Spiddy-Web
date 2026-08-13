@@ -1,0 +1,380 @@
+{% extends 'drop/base.html' %}
+
+{% block content %}
+<div class="spidey-card web-panel p-8" data-page-hero data-page-card>
+    <div class="shine-layer"></div>
+    <h2 class="text-2xl font-bold mb-6 text-center text-white" data-reveal>Shoot a Web (Upload File)</h2>
+
+    {% if error %}
+    <div class="bg-red-900/50 border border-red-500 text-red-200 p-4 rounded-lg mb-6 text-sm text-center font-semibold">
+        {{ error }}
+    </div>
+    {% endif %}
+
+    <form id="uploadForm" action="{% url 'upload' %}" method="post" enctype="multipart/form-data" class="space-y-6"
+        data-reveal>
+        {% csrf_token %}
+        <div id="dropZone"
+            class="border-2 border-dashed border-gray-500 rounded-xl p-8 text-center transition-all cursor-pointer select-none">
+            <svg class="w-12 h-12 mx-auto text-gray-400 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+            </svg>
+            <p class="text-gray-300 mb-1">Click to select or <span class="text-red-400 font-semibold">drag &amp;
+                    drop</span> a file</p>
+            <p class="text-xs text-gray-600">Max size: <span class="text-gray-400 font-semibold">2 GB</span>
+                &nbsp;·&nbsp; Images, docs, zips and media accepted</p>
+            <input type="file" id="fileInput" name="file" class="hidden" multiple required>
+            <p id="fileInfo" class="text-sm text-red-400 mt-3 font-bold min-h-[1.25rem]"></p>
+        </div>
+
+        <!-- Selected Files Manager List -->
+        <div id="fileListContainer" class="hidden bg-gray-900/90 border border-gray-700 rounded-xl p-4 space-y-3">
+            <div class="flex justify-between items-center border-b border-gray-800 pb-2">
+                <span class="text-xs uppercase tracking-widest text-red-400 font-bold" id="fileListTitle">📦 Selected Files</span>
+                <span class="text-xs text-gray-400 font-mono font-bold" id="fileListSummary"></span>
+            </div>
+            <div id="fileItemsList" class="space-y-2 max-h-52 overflow-y-auto pr-1"></div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <label class="block">
+                <span class="block text-xs uppercase tracking-widest text-gray-500 mb-2">Expiry</span>
+                <select name="expires_hours"
+                    class="w-full bg-gray-900 border border-gray-700 rounded-lg p-3 text-white focus:outline-none focus:border-blue-400">
+                    <option value="1">1 Hour</option>
+                    <option value="6">6 Hours</option>
+                    <option value="24" selected>24 Hours</option>
+                    <option value="168">7 Days</option>
+                </select>
+            </label>
+            <label class="block">
+                <span class="block text-xs uppercase tracking-widest text-gray-500 mb-2">Secret Password (Optional)</span>
+                <input type="password" name="password" placeholder="Passcode (Optional)"
+                    class="w-full bg-gray-900 border border-gray-700 rounded-lg p-3 text-white focus:outline-none focus:border-red-400 placeholder-gray-600">
+            </label>
+            <label class="block">
+                <span class="block text-xs uppercase tracking-widest text-gray-500 mb-2">Mode</span>
+                <span
+                    class="flex items-center gap-3 bg-gray-900 border border-gray-700 rounded-lg p-3 h-[50px] text-sm text-gray-300">
+                    <input type="checkbox" name="one_time"
+                        class="h-4 w-4 rounded border-gray-500 bg-gray-800 text-red-500 focus:ring-red-500">
+                    One-time download
+                </span>
+            </label>
+        </div>
+
+        <div id="uploadProgress" class="hidden">
+            <div class="flex justify-between text-xs mb-2">
+                <span class="text-gray-400" id="uploadStatus">Uploading...</span>
+                <span class="text-blue-400 font-bold" id="uploadPercent">0%</span>
+            </div>
+            <div class="bg-gray-800 rounded-full h-4 overflow-hidden border border-gray-700">
+                <div id="uploadBar" class="h-full rounded-full"
+                    style="width:0%;background:linear-gradient(90deg,#E23636,#518CCA);"></div>
+            </div>
+        </div>
+
+        <button type="submit" id="uploadBtn"
+            class="w-full btn-red text-white font-bold py-3 px-4 rounded-lg text-lg uppercase tracking-wider cta-btn" data-spidey-msg="Web swing karke file bhej de!">
+            Web Swing (Upload)
+        </button>
+    </form>
+
+    <div class="mt-6 text-center">
+        <a href="{% url 'download' %}"
+            class="text-blue-400 hover:text-blue-300 underline underline-offset-4 text-sm font-semibold">Have a PIN?
+            Download a file instead</a>
+    </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script>
+    const dropZone = document.getElementById('dropZone');
+    const fileInput = document.getElementById('fileInput');
+    const fileInfoEl = document.getElementById('fileInfo');
+    const uploadForm = document.getElementById('uploadForm');
+    const uploadProgress = document.getElementById('uploadProgress');
+    const uploadBar = document.getElementById('uploadBar');
+    const uploadPercent = document.getElementById('uploadPercent');
+    const uploadStatus = document.getElementById('uploadStatus');
+    const uploadBtn = document.getElementById('uploadBtn');
+
+    const CHUNK_SIZE = 2 * 1024 * 1024; // 2MB chunks
+
+    function fmtBytes(b) {
+        if (b < 1024) return b + ' B';
+        if (b < 1048576) return (b / 1024).toFixed(1) + ' KB';
+        if (b < 1073741824) return (b / 1048576).toFixed(2) + ' MB';
+        return (b / 1073741824).toFixed(2) + ' GB';
+    }
+
+    let selectedFilesStore = [];
+
+    const fileListContainer = document.getElementById('fileListContainer');
+    const fileItemsList = document.getElementById('fileItemsList');
+    const fileListSummary = document.getElementById('fileListSummary');
+    const fileListTitle = document.getElementById('fileListTitle');
+
+    function fmtBytes(b) {
+        if (b < 1024) return b + ' B';
+        if (b < 1048576) return (b / 1024).toFixed(1) + ' KB';
+        if (b < 1073741824) return (b / 1048576).toFixed(2) + ' MB';
+        return (b / 1073741824).toFixed(2) + ' GB';
+    }
+
+    function syncFileInput() {
+        const dt = new DataTransfer();
+        selectedFilesStore.forEach(f => dt.items.add(f));
+        fileInput.files = dt.files;
+    }
+
+    function renderSelectedFilesList() {
+        fileItemsList.innerHTML = '';
+
+        if (selectedFilesStore.length === 0) {
+            fileListContainer.classList.add('hidden');
+            fileInfoEl.textContent = '';
+            syncFileInput();
+            return;
+        }
+
+        fileListContainer.classList.remove('hidden');
+        let totalBytes = 0;
+
+        selectedFilesStore.forEach((file, index) => {
+            totalBytes += file.size;
+
+            const item = document.createElement('div');
+            item.className = 'flex items-center justify-between bg-gray-950 border border-gray-800 rounded-lg p-2.5 text-xs transition-all hover:border-gray-700';
+            
+            const ext = file.name.split('.').pop().toLowerCase();
+            let icon = '📄';
+            if (['png', 'jpg', 'jpeg', 'gif', 'webp', 'svg'].includes(ext)) icon = '🖼️';
+            else if (['mp4', 'mkv', 'avi', 'mov'].includes(ext)) icon = '🎥';
+            else if (['mp3', 'wav', 'flac'].includes(ext)) icon = '🎵';
+            else if (['zip', 'rar', '7z', 'tar', 'gz'].includes(ext)) icon = '📦';
+            else if (['pdf', 'doc', 'docx', 'txt'].includes(ext)) icon = '📝';
+
+            item.innerHTML = `
+                <div class="flex items-center gap-2 truncate max-w-[70%]">
+                    <span>${icon}</span>
+                    <span class="font-semibold text-gray-200 truncate" title="${file.name}">${file.name}</span>
+                </div>
+                <div class="flex items-center gap-3 shrink-0">
+                    <span class="text-gray-400 font-mono">${fmtBytes(file.size)}</span>
+                    <button type="button" onclick="removeSelectedFile(${index})" 
+                        class="text-red-400 hover:text-red-300 hover:bg-red-950/60 p-1 rounded font-bold transition-colors text-xs" 
+                        title="Remove this file">
+                        ❌ Remove
+                    </button>
+                </div>
+            `;
+            fileItemsList.appendChild(item);
+        });
+
+        fileListTitle.textContent = `📦 Selected Files (${selectedFilesStore.length})`;
+        fileListSummary.textContent = `Total: ${fmtBytes(totalBytes)}`;
+        fileInfoEl.textContent = `Selected ${selectedFilesStore.length} file(s) — Total: ${fmtBytes(totalBytes)}`;
+
+        syncFileInput();
+    }
+
+    function appendFiles(newFiles) {
+        if (!newFiles || newFiles.length === 0) return;
+        for (let i = 0; i < newFiles.length; i++) {
+            selectedFilesStore.push(newFiles[i]);
+        }
+        renderSelectedFilesList();
+    }
+
+    window.removeSelectedFile = function(index) {
+        if (index >= 0 && index < selectedFilesStore.length) {
+            selectedFilesStore.splice(index, 1);
+            renderSelectedFilesList();
+        }
+    };
+
+    function triggerWebRipple(x, y) {
+        const rect = dropZone.getBoundingClientRect();
+        const ripple = document.createElement('div');
+        ripple.className = 'absolute rounded-full pointer-events-none border-2 border-red-500 shadow-[0_0_15px_#E23636] opacity-90';
+        ripple.style.left = (x - rect.left) + 'px';
+        ripple.style.top = (y - rect.top) + 'px';
+        ripple.style.width = '10px';
+        ripple.style.height = '10px';
+        ripple.style.transform = 'translate(-50%, -50%)';
+        dropZone.appendChild(ripple);
+
+        if (window.gsap) {
+            gsap.to(ripple, {
+                width: '350px',
+                height: '350px',
+                opacity: 0,
+                duration: 0.8,
+                ease: 'power2.out',
+                onComplete: () => ripple.remove()
+            });
+        } else {
+            setTimeout(() => ripple.remove(), 800);
+        }
+    }
+
+    dropZone.addEventListener('click', (e) => {
+        if (e.target.closest('#fileListContainer')) return;
+        fileInput.click();
+    });
+
+    dropZone.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        dropZone.style.borderColor = '#E23636';
+        dropZone.style.background = 'rgba(226,54,54,0.12)';
+        dropZone.style.boxShadow = '0 0 25px rgba(226,54,54,0.4)';
+        if (window.gsap) {
+            gsap.to(dropZone, { scale: 1.02, duration: 0.18, ease: 'power2.out' });
+        }
+    });
+
+    dropZone.addEventListener('dragleave', () => {
+        dropZone.style.borderColor = '';
+        dropZone.style.background = '';
+        dropZone.style.boxShadow = '';
+        if (window.gsap) {
+            gsap.to(dropZone, { scale: 1, duration: 0.18, ease: 'power2.out' });
+        }
+    });
+
+    dropZone.addEventListener('drop', (e) => {
+        e.preventDefault();
+        dropZone.style.borderColor = '';
+        dropZone.style.background = '';
+        dropZone.style.boxShadow = '';
+        triggerWebRipple(e.clientX, e.clientY);
+        if (window.playThwipSound) window.playThwipSound();
+        if (window.gsap) {
+            gsap.to(dropZone, { scale: 1, duration: 0.18, ease: 'power2.out' });
+        }
+        if (e.dataTransfer.files.length > 0) {
+            appendFiles(Array.from(e.dataTransfer.files));
+        }
+    });
+
+    fileInput.addEventListener('change', () => {
+        if (fileInput.files.length > 0) {
+            appendFiles(Array.from(fileInput.files));
+        }
+    });
+
+    // Helper to generate a unique ID for the upload session
+    function generateUploadId() {
+        return Date.now().toString(36) + Math.random().toString(36).substr(2);
+    }
+
+    uploadForm.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        if (selectedFilesStore.length === 0) {
+            fileInfoEl.textContent = 'Select one or more files first.';
+            return;
+        }
+
+        uploadBtn.disabled = true;
+        uploadProgress.classList.remove('hidden');
+
+        let fileToUpload;
+        const selectedFiles = selectedFilesStore;
+
+        if (selectedFiles.length === 1) {
+            fileToUpload = selectedFiles[0];
+        } else {
+            // Bundle multiple files into a single zip archive
+            uploadStatus.textContent = 'Zipping files...';
+            uploadBtn.textContent = '📦 Zipping...';
+            if (window.showSpiderSenseToast) {
+                window.showSpiderSenseToast(`Zipping ${selectedFiles.length} files into a single web bundle...`, "SPIDDY DROP");
+            }
+            const zip = new JSZip();
+            selectedFiles.forEach(f => zip.file(f.name, f));
+            const zipBlob = await zip.generateAsync({ type: 'blob' }, (metadata) => {
+                uploadPercent.textContent = Math.round(metadata.percent) + '%';
+                uploadBar.style.width = metadata.percent + '%';
+            });
+            fileToUpload = new File([zipBlob], `Spiddy_Drop_Bundle_${selectedFiles.length}_files.zip`, { type: 'application/zip' });
+        }
+
+        const file = fileToUpload;
+        const totalChunks = Math.ceil(file.size / CHUNK_SIZE);
+        const uploadId = generateUploadId();
+        const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+        const expiresHours = document.querySelector('[name=expires_hours]').value;
+        const oneTime = document.querySelector('[name=one_time]').checked;
+        const passwordVal = document.querySelector('[name=password]').value;
+
+        if (window.showSpiderSenseToast) {
+            window.showSpiderSenseToast(`Uploading ${file.name}...`, "SPIDDY DROP");
+        }
+
+        uploadBtn.textContent = 'Uploading...';
+        if (window.gsap) {
+            gsap.fromTo(uploadProgress, { opacity: 0, y: 8 }, { opacity: 1, y: 0, duration: 0.28, ease: 'power2.out' });
+        }
+
+        let uploadedBytes = 0;
+
+        for (let chunkIndex = 0; chunkIndex < totalChunks; chunkIndex++) {
+            const start = chunkIndex * CHUNK_SIZE;
+            const end = Math.min(start + CHUNK_SIZE, file.size);
+            const chunk = file.slice(start, end);
+
+            const formData = new FormData();
+            formData.append('file', chunk);
+            formData.append('filename', file.name);
+            formData.append('chunk_index', chunkIndex);
+            formData.append('total_chunks', totalChunks);
+            formData.append('upload_id', uploadId);
+            formData.append('expires_hours', expiresHours);
+            formData.append('one_time', oneTime);
+            formData.append('password', passwordVal);
+
+            try {
+                const response = await fetch(uploadForm.action, {
+                    method: 'POST',
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'X-CSRFToken': csrfToken
+                    },
+                    body: formData
+                });
+
+                if (!response.ok) throw new Error('Network error');
+                
+                const data = await response.json();
+                if (data.status === 'error') {
+                    throw new Error(data.message);
+                }
+
+                uploadedBytes += (end - start);
+                const percent = Math.round((uploadedBytes / file.size) * 100);
+                
+                if (window.gsap) {
+                    gsap.to(uploadBar, { width: percent + '%', duration: 0.2, ease: 'power1.out' });
+                } else {
+                    uploadBar.style.width = percent + '%';
+                }
+                uploadPercent.textContent = percent + '%';
+                uploadStatus.textContent = `${fmtBytes(uploadedBytes)} / ${fmtBytes(file.size)}`;
+
+                if (data.status === 'success') {
+                    window.location.href = data.redirect_url;
+                    return; // End loop
+                }
+
+            } catch (err) {
+                uploadBtn.disabled = false;
+                uploadBtn.textContent = 'Web Swing (Upload)';
+                fileInfoEl.textContent = err.message || 'Upload failed. Please try again.';
+                return; // Stop upload
+            }
+        }
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,221 @@
+{% extends 'drop/base.html' %}
+
+{% block content %}
+{% if file_info %}
+<!-- File info + download panel -->
+<div class="spidey-card web-panel p-8" data-page-hero data-page-card>
+    <div class="shine-layer"></div>
+    <h2 class="text-2xl font-bold mb-6 text-center text-white" data-reveal>🕷️ Web Caught!</h2>
+
+    {% if file_info.previewable %}
+    <div class="mb-6 rounded-xl overflow-hidden border border-gray-700 bg-gray-950" data-reveal>
+        <img src="{% url 'file_preview' file_info.pin %}" alt="Preview for {{ file_info.name }}"
+            class="w-full max-h-72 object-contain">
+    </div>
+    {% endif %}
+
+    <div class="bg-gray-900 border border-gray-700 rounded-xl p-5 mb-6 space-y-4" data-reveal>
+        <div class="flex justify-between items-center border-b border-gray-800 pb-3">
+            <span class="text-gray-500 text-xs uppercase tracking-widest">File</span>
+            <span class="text-white font-bold text-sm truncate max-w-[220px]" title="{{ file_info.name }}">{{
+                file_info.name }}</span>
+        </div>
+        <div class="flex justify-between items-center border-b border-gray-800 pb-3">
+            <span class="text-gray-500 text-xs uppercase tracking-widest">Size</span>
+            <span class="text-blue-400 font-bold">{{ file_info.size }}</span>
+        </div>
+        <div class="flex justify-between items-center">
+            <span class="text-gray-500 text-xs uppercase tracking-widest">Expires In</span>
+            <span class="text-red-400 font-bold font-mono text-xl" id="countdown">--:--:--</span>
+        </div>
+        <div class="flex justify-between items-center border-t border-gray-800 pt-3">
+            <span class="text-gray-500 text-xs uppercase tracking-widest">Mode</span>
+            <span class="text-white font-bold">{% if file_info.one_time %}One-time delete{% else %}Reusable until
+                expiry{% endif %}</span>
+        </div>
+    </div>
+
+    {% if file_info.has_password %}
+    <div class="mb-5 bg-yellow-950/40 border border-yellow-500/50 rounded-xl p-4" data-reveal>
+        <label class="block text-xs uppercase tracking-widest text-yellow-400 font-bold mb-2">🔒 Passcode Required</label>
+        <input type="password" id="downloadPassword" placeholder="Enter drop password..."
+            class="w-full bg-gray-900 border border-yellow-500 rounded-lg p-3 text-white focus:outline-none focus:border-red-400">
+    </div>
+    {% endif %}
+
+    <!-- Progress -->
+    <div id="progressContainer" class="hidden mb-5" data-reveal>
+        <div class="flex justify-between text-xs mb-2">
+            <span class="text-gray-400" id="progressBytes">0 B / {{ file_info.size }}</span>
+            <span class="text-blue-400 font-bold" id="downloadSpeed">-- KB/s</span>
+        </div>
+        <div class="bg-gray-800 rounded-full h-4 overflow-hidden border border-gray-700">
+            <div id="progressBar" class="h-full rounded-full transition-all duration-150"
+                style="width:0%;background:linear-gradient(90deg,#E23636,#518CCA);"></div>
+        </div>
+        <div class="text-center text-white font-bold text-sm mt-2" id="progressPercent">0%</div>
+    </div>
+
+    <div id="successMsg"
+        class="hidden bg-green-900/50 border border-green-500 text-green-200 p-4 rounded-lg mb-5 text-sm text-center font-semibold">
+        ✅ File downloaded successfully!</div>
+    <div id="errorMsg"
+        class="hidden bg-red-900/50 border border-red-500 text-red-200 p-4 rounded-lg mb-5 text-sm text-center font-semibold">
+    </div>
+
+    <button onclick="startDownload('{{ file_info.pin }}', '{{ file_info.name|escapejs }}')" id="downloadBtn"
+        class="w-full btn-blue text-white font-bold py-3 px-4 rounded-lg text-lg uppercase tracking-wider cta-btn" data-spidey-msg="Web pakad liya! File download ho rahi hai...">
+        ⬇️ Download File
+    </button>
+
+    <div class="mt-5 text-center">
+        <a href="{% url 'download' %}" class="text-gray-500 hover:text-gray-400 text-xs underline underline-offset-4">←
+            Try another PIN</a>
+    </div>
+</div>
+
+<script>
+    const pageLoadTime = Date.now();
+    const initialRemainingMs = {{ file_info.expires_ms }};
+
+    function updateCountdown() {
+        const remaining = Math.max(0, initialRemainingMs - (Date.now() - pageLoadTime));
+        const el = document.getElementById('countdown');
+        const btn = document.getElementById('downloadBtn');
+        if (remaining === 0) { el.textContent = 'EXPIRED'; btn.disabled = true; btn.textContent = '⚠️ File Expired'; return; }
+        const h = Math.floor(remaining / 3600000);
+        const m = Math.floor((remaining % 3600000) / 60000);
+        const s = Math.floor((remaining % 60000) / 1000);
+        el.textContent = `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+    }
+    updateCountdown();
+    setInterval(updateCountdown, 1000);
+
+    function fmtBytes(b) {
+        if (b < 1024) return b + ' B';
+        if (b < 1048576) return (b / 1024).toFixed(1) + ' KB';
+        return (b / 1048576).toFixed(2) + ' MB';
+    }
+
+    async function startDownload(pin, filename) {
+        const btn = document.getElementById('downloadBtn');
+        const progressContainer = document.getElementById('progressContainer');
+        const progressBar = document.getElementById('progressBar');
+        const progressPercent = document.getElementById('progressPercent');
+        const downloadSpeed = document.getElementById('downloadSpeed');
+        const progressBytes = document.getElementById('progressBytes');
+        const successMsg = document.getElementById('successMsg');
+        const errorMsg = document.getElementById('errorMsg');
+        const pwdEl = document.getElementById('downloadPassword');
+        const pwd = pwdEl ? pwdEl.value : '';
+
+        if (window.showSpiderSenseToast) {
+            window.showSpiderSenseToast(`Downloading ${filename}...`, "SPIDDY DROP");
+        }
+
+        btn.disabled = true;
+        btn.textContent = '⏳ Downloading...';
+        progressContainer.classList.remove('hidden');
+        successMsg.classList.add('hidden');
+        errorMsg.classList.add('hidden');
+
+        try {
+            const fetchUrl = `/file/${pin}/download/` + (pwd ? `?password=${encodeURIComponent(pwd)}` : '');
+            const response = await fetch(fetchUrl);
+            if (!response.ok) {
+                if (response.status === 403) throw new Error('Incorrect password.');
+                if (response.status === 410) throw new Error('File has expired.');
+                throw new Error('File not found.');
+            }
+
+            const contentLength = parseInt(response.headers.get('Content-Length') || '0');
+            const reader = response.body.getReader();
+            const chunks = [];
+            let received = 0;
+            const startTime = Date.now();
+
+            while (true) {
+                const { done, value } = await reader.read();
+                if (done) break;
+                chunks.push(value);
+                received += value.length;
+                const elapsed = Math.max((Date.now() - startTime) / 1000, 0.001);
+                const speed = received / elapsed;
+                const pct = contentLength ? Math.min(received / contentLength * 100, 100) : 50;
+                if (window.gsap) {
+                    gsap.to(progressBar, { width: pct.toFixed(1) + '%', duration: 0.14, ease: 'power1.out' });
+                } else {
+                    progressBar.style.width = pct.toFixed(1) + '%';
+                }
+                progressPercent.textContent = pct.toFixed(0) + '%';
+                downloadSpeed.textContent = fmtBytes(speed) + '/s';
+                progressBytes.textContent = `${fmtBytes(received)} / ${fmtBytes(contentLength || received)}`;
+            }
+
+            const blob = new Blob(chunks);
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url; a.download = filename;
+            document.body.appendChild(a); a.click();
+            document.body.removeChild(a); URL.revokeObjectURL(url);
+
+            if (window.gsap) {
+                gsap.to(progressBar, { width: '100%', duration: 0.16, ease: 'power1.out' });
+            } else {
+                progressBar.style.width = '100%';
+            }
+            progressPercent.textContent = '100%';
+            successMsg.classList.remove('hidden');
+            if (window.gsap) {
+                gsap.fromTo(successMsg, { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: 0.26, ease: 'power2.out' });
+            }
+            btn.textContent = '⬇️ Download Again';
+            btn.disabled = false;
+        } catch (err) {
+            errorMsg.textContent = '❌ Download failed: ' + err.message;
+            errorMsg.classList.remove('hidden');
+            if (window.gsap) {
+                gsap.fromTo(errorMsg, { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: 0.26, ease: 'power2.out' });
+            }
+            btn.textContent = '⬇️ Retry Download';
+            btn.disabled = false;
+        }
+    }
+</script>
+
+{% else %}
+<!-- PIN entry -->
+<div class="spidey-card web-panel p-8" data-page-hero data-page-card>
+    <div class="shine-layer"></div>
+    <h2 class="text-2xl font-bold mb-6 text-center text-white" data-reveal>Catch the Web (Download)</h2>
+
+    {% if error %}
+    <div class="bg-red-900/50 border border-red-500 text-red-200 p-4 rounded-lg mb-6 text-sm text-center font-semibold">
+        {{ error }}
+    </div>
+    {% endif %}
+
+    <form action="{% url 'download' %}" method="post" class="space-y-4 text-center" data-reveal>
+        {% csrf_token %}
+        <p class="text-gray-300 text-sm">Enter the 6-digit PIN below:</p>
+        <input type="text" name="pin" maxlength="6"
+            class="w-full bg-gray-900 border-2 border-blue-500 rounded-lg p-4 text-center text-4xl font-mono font-bold text-white tracking-[0.25em] focus:outline-none focus:border-red-500 transition-colors"
+            placeholder="------" required autocomplete="off" inputmode="numeric" pattern="[0-9]{6}">
+        
+        <input type="password" name="password" placeholder="Passcode (if drop is password-protected)"
+            class="w-full bg-gray-900 border border-gray-700 rounded-lg p-3 text-center text-sm text-white focus:outline-none focus:border-blue-400 placeholder-gray-600">
+
+        <button type="submit"
+            class="w-full btn-blue text-white font-bold py-3 px-4 rounded-lg text-lg uppercase tracking-wider mt-2 cta-btn" data-spidey-msg="PIN theek hai na? Let's go!">
+            Retrieve File
+        </button>
+    </form>
+
+    <div class="mt-6 text-center">
+        <a href="{% url 'upload' %}"
+            class="text-red-400 hover:text-red-300 underline underline-offset-4 text-sm font-semibold">Want to upload a
+            file instead?</a>
+    </div>
+</div>
+{% endif %}
+{% endblock %}
