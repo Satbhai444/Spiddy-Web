@@ -40,3 +40,25 @@ class FileDrop(models.Model):
 
     def __str__(self):
         return f"{self.pin} - {self.original_filename or self.file.name}"
+
+class Room(models.Model):
+    code = models.CharField(max_length=6, default=generate_pin, unique=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    expires_hours = models.IntegerField(default=24)
+
+    def is_expired(self):
+        return timezone.now() > self.created_at + timedelta(hours=self.expires_hours)
+
+    def __str__(self):
+        return f"Room {self.code}"
+
+class RoomMessage(models.Model):
+    room = models.ForeignKey(Room, on_delete=models.CASCADE, related_name='messages')
+    sender_name = models.CharField(max_length=50)
+    text_content = models.TextField(blank=True, null=True)
+    file = models.FileField(upload_to='room_drops/', blank=True, null=True)
+    original_filename = models.CharField(max_length=255, blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"[{self.room.code}] {self.sender_name}"

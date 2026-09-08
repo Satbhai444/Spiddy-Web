@@ -17,7 +17,13 @@ urlpatterns = [
     path('file/<str:pin>/download/', views.file_download_view, name='file_download'),
     path('robots.txt', views.robots_txt_view, name='robots_txt'),
     path('sitemap.xml', views.sitemap_xml_view, name='sitemap_xml'),
-    re_path(r'^.*$', views.custom_404_view, name='404_catchall'),
+    
+    # Spider-Verse Rooms
+    path('room/create/', views.create_room_view, name='create_room'),
+    path('room/join/', views.join_room_view, name='join_room'),
+    path('room/<str:room_code>/', views.room_chat_view, name='room_chat'),
+    path('room/<str:room_code>/send/', views.api_send_message, name='api_send_message'),
+    path('room/<str:room_code>/messages/', views.api_get_messages, name='api_get_messages'),
 ]
 
 handler404 = 'drop.views.custom_404_view'

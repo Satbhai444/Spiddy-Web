@@ -423,3 +423,149 @@ def sitemap_xml_view(request):
 </urlset>
 """
     return HttpResponse(content, content_type="application/xml")
+
+# --- SPIDER-VERSE ROOMS VIEWS ---
+
+from .models import Room, RoomMessage
+import json
+
+def create_room_view(request):
+    if request.method == 'POST':
+        sender_name = request.POST.get('sender_name', '').strip()
+        if not sender_name:
+            return JsonResponse({'status': 'error', 'message': 'Name is required'})
+        
+        # Create a new Room
+        room = Room.objects.create()
+        
+        # Save credentials in session
+        request.session['room_code'] = room.code
+        request.session['sender_name'] = sender_name
+        
+        # Create a system message welcoming the user
+        RoomMessage.objects.create(
+            room=room,
+            sender_name='System (K.A.R.E.N)',
+            text_content=f"{sender_name} has created the web room! Share the code {room.code} with your friends."
+        )
+        
+        return JsonResponse({'status': 'success', 'room_code': room.code})
+    return JsonResponse({'status': 'error', 'message': 'Invalid request'})
+
+def join_room_view(request):
+    if request.method == 'POST':
+        room_code = request.POST.get('room_code', '').strip().upper()
+        sender_name = request.POST.get('sender_name', '').strip()
+        
+        if not room_code or not sender_name:
+            return JsonResponse({'status': 'error', 'message': 'Room code and Name are required'})
+        
+        try:
+            room = Room.objects.get(code=room_code)
+        except Room.DoesNotExist:
+            return JsonResponse({'status': 'error', 'message': 'Invalid Room Code'})
+            
+        if room.is_expired():
+            room.delete()
+            return JsonResponse({'status': 'error', 'message': 'This room has self-destructed.'})
+            
+        request.session['room_code'] = room.code
+        request.session['sender_name'] = sender_name
+        
+        RoomMessage.objects.create(
+            room=room,
+            sender_name='System (K.A.R.E.N)',
+            text_content=f"{sender_name} just swung into the room!"
+        )
+        
+        return JsonResponse({'status': 'success', 'room_code': room.code})
+    return JsonResponse({'status': 'error', 'message': 'Invalid request'})
+
+def room_chat_view(request, room_code):
+    try:
+        room = Room.objects.get(code=room_code)
+    except Room.DoesNotExist:
+        return render(request, 'drop/404.html', status=404)
+        
+    if room.is_expired():
+        room.delete()
+        return render(request, 'drop/download.html', {'error': 'This room has self-destructed.'})
+        
+    session_code = request.session.get('room_code')
+    sender_name = request.session.get('sender_name')
+    
+    # If not authenticated for this room, redirect to home
+    if session_code != room_code or not sender_name:
+        return redirect('home')
+        
+    return render(request, 'drop/room.html', {
+        'room': room,
+        'sender_name': sender_name
+    })
+
+def api_send_message(request, room_code):
+    if request.method == 'POST':
+        session_code = request.session.get('room_code')
+        sender_name = request.session.get('sender_name')
+        
+        if session_code != room_code or not sender_name:
+            return JsonResponse({'status': 'error', 'message': 'Unauthorized'}, status=403)
+            
+        try:
+            room = Room.objects.get(code=room_code)
+        except Room.DoesNotExist:
+            return JsonResponse({'status': 'error', 'message': 'Room not found'}, status=404)
+            
+        text_content = request.POST.get('text_content', '').strip()
+        uploaded_file = request.FILES.get('file')
+        
+        if not text_content and not uploaded_file:
+            return JsonResponse({'status': 'error', 'message': 'Cannot send empty message'})
+            
+        original_filename = None
+        if uploaded_file:
+            original_filename = uploaded_file.name
+            
+        RoomMessage.objects.create(
+            room=room,
+            sender_name=sender_name,
+            text_content=text_content,
+            file=uploaded_file,
+            original_filename=original_filename
+        )
+        
+        return JsonResponse({'status': 'success'})
+    return JsonResponse({'status': 'error', 'message': 'Invalid request'})
+
+def api_get_messages(request, room_code):
+    if request.method == 'GET':
+        session_code = request.session.get('room_code')
+        sender_name = request.session.get('sender_name')
+        
+        if session_code != room_code or not sender_name:
+            return JsonResponse({'status': 'error', 'message': 'Unauthorized'}, status=403)
+            
+        last_id = request.GET.get('last_id', 0)
+        try:
+            last_id = int(last_id)
+        except ValueError:
+            last_id = 0
+            
+        messages = RoomMessage.objects.filter(room__code=room_code, id__gt=last_id).order_by('id')
+        
+        data = []
+        for msg in messages:
+            file_url = msg.file.url if msg.file else None
+            data.append({
+                'id': msg.id,
+                'sender_name': msg.sender_name,
+                'text_content': msg.text_content,
+                'file_url': file_url,
+                'original_filename': msg.original_filename,
+                'created_at': msg.created_at.strftime("%I:%M %p"),
+                'is_me': msg.sender_name == sender_name,
+                'is_system': msg.sender_name == 'System (K.A.R.E.N)'
+            })
+            
+        return JsonResponse({'status': 'success', 'messages': data})
+    return JsonResponse({'status': 'error', 'message': 'Invalid request'})

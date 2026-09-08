@@ -14,7 +14,9 @@
         <img src="https://raw.githubusercontent.com/Satbhai444/Spiddy-Web/main/drop/static/drop/images/spiderman.png" alt="Spider-Man" class="h-9 object-contain drop-shadow-[0_0_8px_rgba(226,54,54,0.8)]">
         <span class="spidey-title text-3xl text-white tracking-wide">SPIDDY</span>
     </a>
-    <div class="flex gap-3">
+    <div class="flex gap-3 items-center">
+        <button onclick="openRoomModal()"
+            class="text-gray-300 hover:text-white font-bold py-2 px-3 rounded-lg uppercase tracking-wider text-xs border border-gray-600 hover:border-gray-400 transition-colors cta-btn" data-spidey-msg="Spider-Verse Room!">Rooms 🕸️</button>
         <a href="{% url 'upload' %}"
             class="btn-red text-white text-xs font-bold py-2 px-5 rounded-lg uppercase tracking-wider cta-btn" data-spidey-msg="Jaala fek aur file share kar!">Upload</a>
         <a href="{% url 'download' %}"
@@ -38,7 +40,7 @@
         <span style="color:#ffffff; text-shadow: 4px 4px 0px #dc2626, -2px -2px 0px #2563eb, 6px 6px 12px rgba(0,0,0,0.9);">DROP</span>
     </h1>
     <p class="text-xl text-gray-200 mb-1 max-w-2xl mx-auto font-medium" data-reveal>
-        Share files instantly with a secret PIN.
+        Share files instantly with a secret PIN. Or join a <span class="text-blue-400 font-bold">Spider-Verse Room</span>!
     </p>
     <p class="text-xl text-gray-200 mb-4 max-w-2xl mx-auto font-medium" data-reveal>
         No account. No trace. <span class="text-red-500 font-bold">Self-destructs in 24 hours.</span>
@@ -54,6 +56,12 @@
             class="btn-blue text-white font-bold py-4 px-12 rounded-xl text-lg uppercase tracking-widest cta-btn" data-spidey-msg="PIN daal aur magic dekh!">
             🎯 Catch a Web
         </a>
+    </div>
+    
+    <div class="mt-8" data-reveal>
+        <button onclick="openRoomModal()" class="text-gray-300 hover:text-white font-bold py-3 px-8 rounded-xl text-md uppercase tracking-widest border border-gray-600 hover:border-gray-400 transition-colors cta-btn" data-spidey-msg="Group chat with files!">
+            🌐 Enter Spider-Verse Rooms
+        </button>
     </div>
 
     <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 max-w-3xl mx-auto mt-12 text-left" data-stagger-group>
@@ -226,5 +234,156 @@
         </a>
     </div>
 </div>
+
+<!-- Spider-Verse Rooms Modals -->
+<div id="roomModalOverlay" class="fixed inset-0 z-[60] bg-black bg-opacity-80 backdrop-blur-sm hidden flex items-center justify-center p-4">
+    
+    <!-- Main Modal: Choose Action -->
+    <div id="roomMainModal" class="spidey-card web-panel p-8 w-full max-w-md relative">
+        <button onclick="closeRoomModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white text-2xl">&times;</button>
+        <h3 class="text-3xl spidey-title text-white mb-2 text-center">Spider-Verse Rooms</h3>
+        <p class="text-gray-400 text-center mb-8 text-sm">Join a temporary group to chat and drop files.</p>
+        
+        <div class="flex flex-col gap-4">
+            <button onclick="showCreateRoom()" class="btn-red text-white font-bold py-4 rounded-xl text-lg uppercase tracking-widest w-full text-center">
+                🕸️ Create New Web
+            </button>
+            <button onclick="showJoinRoom()" class="btn-blue text-white font-bold py-4 rounded-xl text-lg uppercase tracking-widest w-full text-center">
+                🤝 Join Existing Web
+            </button>
+        </div>
+    </div>
+
+    <!-- Create Room Modal -->
+    <div id="createRoomModal" class="spidey-card web-panel p-8 w-full max-w-md relative hidden">
+        <button onclick="showMainRoomModal()" class="absolute top-4 left-4 text-gray-400 hover:text-white">&larr; Back</button>
+        <button onclick="closeRoomModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white text-2xl">&times;</button>
+        
+        <h3 class="text-2xl spidey-title text-white mb-6 text-center mt-6">Create Web</h3>
+        <form id="createRoomForm" onsubmit="handleCreateRoom(event)">
+            {% csrf_token %}
+            <div class="mb-6">
+                <label class="block text-gray-400 text-sm font-bold mb-2 uppercase tracking-wider">Your Spidey Name</label>
+                <input type="text" id="createName" required class="w-full bg-gray-900 border border-gray-700 rounded-lg p-3 text-white focus:border-red-500 focus:outline-none" placeholder="e.g. Peter Parker">
+            </div>
+            <button type="submit" class="btn-red text-white font-bold py-3 rounded-xl text-md uppercase tracking-widest w-full">
+                Create Room
+            </button>
+        </form>
+    </div>
+
+    <!-- Join Room Modal -->
+    <div id="joinRoomModal" class="spidey-card web-panel p-8 w-full max-w-md relative hidden">
+        <button onclick="showMainRoomModal()" class="absolute top-4 left-4 text-gray-400 hover:text-white">&larr; Back</button>
+        <button onclick="closeRoomModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white text-2xl">&times;</button>
+        
+        <h3 class="text-2xl spidey-title text-white mb-6 text-center mt-6">Join Web</h3>
+        <form id="joinRoomForm" onsubmit="handleJoinRoom(event)">
+            {% csrf_token %}
+            <div class="mb-4">
+                <label class="block text-gray-400 text-sm font-bold mb-2 uppercase tracking-wider">Room Code</label>
+                <input type="text" id="joinCode" required maxlength="6" class="w-full bg-gray-900 border border-gray-700 rounded-lg p-3 text-white text-center text-2xl tracking-[0.5em] focus:border-blue-500 focus:outline-none" placeholder="------">
+            </div>
+            <div class="mb-6">
+                <label class="block text-gray-400 text-sm font-bold mb-2 uppercase tracking-wider">Your Spidey Name</label>
+                <input type="text" id="joinName" required class="w-full bg-gray-900 border border-gray-700 rounded-lg p-3 text-white focus:border-blue-500 focus:outline-none" placeholder="e.g. Miles Morales">
+            </div>
+            <p id="joinError" class="text-red-500 text-sm text-center mb-4 hidden"></p>
+            <button type="submit" class="btn-blue text-white font-bold py-3 rounded-xl text-md uppercase tracking-widest w-full">
+                Join Room
+            </button>
+        </form>
+    </div>
+</div>
+
+<script>
+    function openRoomModal() {
+        document.getElementById('roomModalOverlay').classList.remove('hidden');
+        showMainRoomModal();
+    }
+    
+    function closeRoomModal() {
+        document.getElementById('roomModalOverlay').classList.add('hidden');
+    }
+    
+    function hideAllModals() {
+        document.getElementById('roomMainModal').classList.add('hidden');
+        document.getElementById('createRoomModal').classList.add('hidden');
+        document.getElementById('joinRoomModal').classList.add('hidden');
+        document.getElementById('joinError').classList.add('hidden');
+    }
+    
+    function showMainRoomModal() {
+        hideAllModals();
+        document.getElementById('roomMainModal').classList.remove('hidden');
+    }
+    
+    function showCreateRoom() {
+        hideAllModals();
+        document.getElementById('createRoomModal').classList.remove('hidden');
+        document.getElementById('createName').focus();
+    }
+    
+    function showJoinRoom() {
+        hideAllModals();
+        document.getElementById('joinRoomModal').classList.remove('hidden');
+        document.getElementById('joinCode').focus();
+    }
+    
+    async function handleCreateRoom(e) {
+        e.preventDefault();
+        const name = document.getElementById('createName').value;
+        const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+        
+        try {
+            const fd = new FormData();
+            fd.append('sender_name', name);
+            
+            const response = await fetch('{% url "create_room" %}', {
+                method: 'POST',
+                body: fd,
+                headers: {'X-CSRFToken': csrfToken, 'X-Requested-With': 'XMLHttpRequest'}
+            });
+            const data = await response.json();
+            if(data.status === 'success') {
+                window.location.href = `/room/${data.room_code}/`;
+            } else {
+                alert(data.message);
+            }
+        } catch(err) {
+            alert('Something went wrong!');
+        }
+    }
+    
+    async function handleJoinRoom(e) {
+        e.preventDefault();
+        const code = document.getElementById('joinCode').value;
+        const name = document.getElementById('joinName').value;
+        const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+        const errEl = document.getElementById('joinError');
+        
+        try {
+            const fd = new FormData();
+            fd.append('room_code', code);
+            fd.append('sender_name', name);
+            
+            const response = await fetch('{% url "join_room" %}', {
+                method: 'POST',
+                body: fd,
+                headers: {'X-CSRFToken': csrfToken, 'X-Requested-With': 'XMLHttpRequest'}
+            });
+            const data = await response.json();
+            if(data.status === 'success') {
+                window.location.href = `/room/${data.room_code}/`;
+            } else {
+                errEl.innerText = data.message;
+                errEl.classList.remove('hidden');
+            }
+        } catch(err) {
+            errEl.innerText = 'Something went wrong!';
+            errEl.classList.remove('hidden');
+        }
+    }
+</script>
 
 {% endblock %}
