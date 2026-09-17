@@ -767,9 +767,16 @@ def api_typing_indicator(request, room_code):
         return JsonResponse({'status': 'success'})
     return JsonResponse({'status': 'error', 'message': 'Invalid request'}, status=405)
 
+def favicon_view(request):
+    """Serve favicon.ico with high compatibility for Googlebot and browsers"""
+    ico_path = os.path.join(settings.BASE_DIR, 'drop', 'static', 'drop', 'images', 'favicon.ico')
+    if os.path.exists(ico_path):
+        return FileResponse(open(ico_path, 'rb'), content_type='image/x-icon')
+    return HttpResponse(status=404)
+
 def manifest_view(request):
     manifest_data = {
-        "name": "SPIDDY - Web File Drop & Spider-Verse Chat",
+        "name": "SPIDDY Web Drop - Anonymous File Sharing & Spider-Verse Rooms",
         "short_name": "SpiddyWeb",
         "description": "Fast, temporary, encrypted anonymous file sharing & Spider-Verse chat rooms.",
         "start_url": "/",
@@ -779,8 +786,14 @@ def manifest_view(request):
         "orientation": "portrait-primary",
         "icons": [
             {
-                "src": "https://raw.githubusercontent.com/Satbhai444/Spiddy-Web/main/drop/static/drop/images/spiderman.png",
-                "sizes": "192x192 512x512",
+                "src": "/static/drop/images/android-chrome-192x192.png",
+                "sizes": "192x192",
+                "type": "image/png",
+                "purpose": "any maskable"
+            },
+            {
+                "src": "/static/drop/images/android-chrome-512x512.png",
+                "sizes": "512x512",
                 "type": "image/png",
                 "purpose": "any maskable"
             }

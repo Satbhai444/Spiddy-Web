@@ -17,6 +17,7 @@ urlpatterns = [
     path('file/<str:pin>/download/', views.file_download_view, name='file_download'),
     path('robots.txt', views.robots_txt_view, name='robots_txt'),
     path('sitemap.xml', views.sitemap_xml_view, name='sitemap_xml'),
+    path('favicon.ico', views.favicon_view, name='favicon'),
     
     # Spider-Verse Rooms
     path('room/create/', views.create_room_view, name='create_room'),
