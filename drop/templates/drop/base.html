@@ -31,6 +31,15 @@
     <link rel="icon"
         href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%95%B7%EF%B8%8F%3C/text%3E%3C/svg%3E">
 
+    <!-- PWA Configuration -->
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#dc2626">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="SpiddyWeb">
+    <link rel="apple-touch-icon" href="https://raw.githubusercontent.com/Satbhai444/Spiddy-Web/main/drop/static/drop/images/spiderman.png">
+
     <!-- Schema.org JSON-LD Structured Data -->
     <script type="application/ld+json">
     {
@@ -347,12 +356,13 @@
             
             toast.classList.remove('opacity-0', 'translate-y-[-20px]');
             toast.classList.add('opacity-100', 'translate-y-0');
-            window.playThwipSound();
+            if (window.playThwipSound) window.playThwipSound();
             
-            setTimeout(() => {
+            if (window._spiderToastTimeout) clearTimeout(window._spiderToastTimeout);
+            window._spiderToastTimeout = setTimeout(() => {
                 toast.classList.remove('opacity-100', 'translate-y-0');
                 toast.classList.add('opacity-0', 'translate-y-[-20px]');
-            }, 4000);
+            }, 3000);
         };
     </script>
 
@@ -609,6 +619,16 @@
     </script>
     {% block page_scripts %}{% endblock %}
 
+    <!-- PWA Service Worker Registration -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js').catch((err) => {
+                    console.log('Service Worker registration skipped', err);
+                });
+            });
+        }
+    </script>
 </body>
 
 </html>

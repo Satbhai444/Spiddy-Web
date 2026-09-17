@@ -58,6 +58,11 @@ class RoomMessage(models.Model):
     text_content = models.TextField(blank=True, null=True)
     file = models.FileField(upload_to='room_drops/', blank=True, null=True)
     original_filename = models.CharField(max_length=255, blank=True, null=True)
+    reply_to = models.ForeignKey('self', on_delete=models.SET_NULL, blank=True, null=True, related_name='replies')
+    avatar = models.CharField(max_length=30, default='classic', blank=True)
+    reactions = models.JSONField(default=dict, blank=True)
+    is_deleted = models.BooleanField(default=False)
+    is_voice_note = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):

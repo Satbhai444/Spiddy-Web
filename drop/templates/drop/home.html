@@ -262,10 +262,53 @@
         <h3 class="text-2xl spidey-title text-white mb-6 text-center mt-6">Create Web</h3>
         <form id="createRoomForm" onsubmit="handleCreateRoom(event)">
             {% csrf_token %}
-            <div class="mb-6">
+            <div class="mb-4">
                 <label class="block text-gray-400 text-sm font-bold mb-2 uppercase tracking-wider">Your Spidey Name</label>
                 <input type="text" id="createName" required class="w-full bg-gray-900 border border-gray-700 rounded-lg p-3 text-white focus:border-red-500 focus:outline-none" placeholder="e.g. Peter Parker">
             </div>
+
+            <!-- Avatar Selection -->
+            <div class="mb-6">
+                <label class="block text-gray-400 text-xs font-bold mb-2 uppercase tracking-wider">Choose Spider Avatar</label>
+                <div class="grid grid-cols-5 gap-2 text-center">
+                    <label class="cursor-pointer">
+                        <input type="radio" name="createAvatar" value="classic" checked class="hidden peer">
+                        <div class="p-2 rounded-xl bg-gray-900 border-2 border-gray-700 peer-checked:border-red-500 peer-checked:bg-red-950/60 transition-all hover:scale-105">
+                            <span class="text-xl block">🔴</span>
+                            <span class="text-[9px] text-gray-300 font-bold block mt-1 truncate">Peter</span>
+                        </div>
+                    </label>
+                    <label class="cursor-pointer">
+                        <input type="radio" name="createAvatar" value="miles" class="hidden peer">
+                        <div class="p-2 rounded-xl bg-gray-900 border-2 border-gray-700 peer-checked:border-red-500 peer-checked:bg-red-950/60 transition-all hover:scale-105">
+                            <span class="text-xl block">🖤</span>
+                            <span class="text-[9px] text-gray-300 font-bold block mt-1 truncate">Miles</span>
+                        </div>
+                    </label>
+                    <label class="cursor-pointer">
+                        <input type="radio" name="createAvatar" value="gwen" class="hidden peer">
+                        <div class="p-2 rounded-xl bg-gray-900 border-2 border-gray-700 peer-checked:border-pink-500 peer-checked:bg-pink-950/60 transition-all hover:scale-105">
+                            <span class="text-xl block">💖</span>
+                            <span class="text-[9px] text-gray-300 font-bold block mt-1 truncate">Gwen</span>
+                        </div>
+                    </label>
+                    <label class="cursor-pointer">
+                        <input type="radio" name="createAvatar" value="punk" class="hidden peer">
+                        <div class="p-2 rounded-xl bg-gray-900 border-2 border-gray-700 peer-checked:border-purple-500 peer-checked:bg-purple-950/60 transition-all hover:scale-105">
+                            <span class="text-xl block">🎸</span>
+                            <span class="text-[9px] text-gray-300 font-bold block mt-1 truncate">Punk</span>
+                        </div>
+                    </label>
+                    <label class="cursor-pointer">
+                        <input type="radio" name="createAvatar" value="2099" class="hidden peer">
+                        <div class="p-2 rounded-xl bg-gray-900 border-2 border-gray-700 peer-checked:border-cyan-500 peer-checked:bg-cyan-950/60 transition-all hover:scale-105">
+                            <span class="text-xl block">🦾</span>
+                            <span class="text-[9px] text-gray-300 font-bold block mt-1 truncate">2099</span>
+                        </div>
+                    </label>
+                </div>
+            </div>
+
             <button type="submit" class="btn-red text-white font-bold py-3 rounded-xl text-md uppercase tracking-widest w-full">
                 Create Room
             </button>
@@ -280,14 +323,57 @@
         <h3 class="text-2xl spidey-title text-white mb-6 text-center mt-6">Join Web</h3>
         <form id="joinRoomForm" onsubmit="handleJoinRoom(event)">
             {% csrf_token %}
-            <div class="mb-4">
+            <div class="mb-3">
                 <label class="block text-gray-400 text-sm font-bold mb-2 uppercase tracking-wider">Room Code</label>
                 <input type="text" id="joinCode" required maxlength="6" class="w-full bg-gray-900 border border-gray-700 rounded-lg p-3 text-white text-center text-2xl tracking-[0.5em] focus:border-blue-500 focus:outline-none" placeholder="------">
             </div>
-            <div class="mb-6">
+            <div class="mb-4">
                 <label class="block text-gray-400 text-sm font-bold mb-2 uppercase tracking-wider">Your Spidey Name</label>
                 <input type="text" id="joinName" required class="w-full bg-gray-900 border border-gray-700 rounded-lg p-3 text-white focus:border-blue-500 focus:outline-none" placeholder="e.g. Miles Morales">
             </div>
+
+            <!-- Avatar Selection for Join -->
+            <div class="mb-6">
+                <label class="block text-gray-400 text-xs font-bold mb-2 uppercase tracking-wider">Choose Spider Avatar</label>
+                <div class="grid grid-cols-5 gap-2 text-center">
+                    <label class="cursor-pointer">
+                        <input type="radio" name="joinAvatar" value="classic" checked class="hidden peer">
+                        <div class="p-2 rounded-xl bg-gray-900 border-2 border-gray-700 peer-checked:border-blue-500 peer-checked:bg-blue-950/60 transition-all hover:scale-105">
+                            <span class="text-xl block">🔴</span>
+                            <span class="text-[9px] text-gray-300 font-bold block mt-1 truncate">Peter</span>
+                        </div>
+                    </label>
+                    <label class="cursor-pointer">
+                        <input type="radio" name="joinAvatar" value="miles" class="hidden peer">
+                        <div class="p-2 rounded-xl bg-gray-900 border-2 border-gray-700 peer-checked:border-blue-500 peer-checked:bg-blue-950/60 transition-all hover:scale-105">
+                            <span class="text-xl block">🖤</span>
+                            <span class="text-[9px] text-gray-300 font-bold block mt-1 truncate">Miles</span>
+                        </div>
+                    </label>
+                    <label class="cursor-pointer">
+                        <input type="radio" name="joinAvatar" value="gwen" class="hidden peer">
+                        <div class="p-2 rounded-xl bg-gray-900 border-2 border-gray-700 peer-checked:border-pink-500 peer-checked:bg-pink-950/60 transition-all hover:scale-105">
+                            <span class="text-xl block">💖</span>
+                            <span class="text-[9px] text-gray-300 font-bold block mt-1 truncate">Gwen</span>
+                        </div>
+                    </label>
+                    <label class="cursor-pointer">
+                        <input type="radio" name="joinAvatar" value="punk" class="hidden peer">
+                        <div class="p-2 rounded-xl bg-gray-900 border-2 border-gray-700 peer-checked:border-purple-500 peer-checked:bg-purple-950/60 transition-all hover:scale-105">
+                            <span class="text-xl block">🎸</span>
+                            <span class="text-[9px] text-gray-300 font-bold block mt-1 truncate">Punk</span>
+                        </div>
+                    </label>
+                    <label class="cursor-pointer">
+                        <input type="radio" name="joinAvatar" value="2099" class="hidden peer">
+                        <div class="p-2 rounded-xl bg-gray-900 border-2 border-gray-700 peer-checked:border-cyan-500 peer-checked:bg-cyan-950/60 transition-all hover:scale-105">
+                            <span class="text-xl block">🦾</span>
+                            <span class="text-[9px] text-gray-300 font-bold block mt-1 truncate">2099</span>
+                        </div>
+                    </label>
+                </div>
+            </div>
+
             <p id="joinError" class="text-red-500 text-sm text-center mb-4 hidden"></p>
             <button type="submit" class="btn-blue text-white font-bold py-3 rounded-xl text-md uppercase tracking-widest w-full">
                 Join Room
@@ -333,11 +419,13 @@
     async function handleCreateRoom(e) {
         e.preventDefault();
         const name = document.getElementById('createName').value;
+        const avatar = document.querySelector('input[name="createAvatar"]:checked')?.value || 'classic';
         const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
         
         try {
             const fd = new FormData();
             fd.append('sender_name', name);
+            fd.append('avatar', avatar);
             
             const response = await fetch('{% url "create_room" %}', {
                 method: 'POST',
@@ -359,6 +447,7 @@
         e.preventDefault();
         const code = document.getElementById('joinCode').value;
         const name = document.getElementById('joinName').value;
+        const avatar = document.querySelector('input[name="joinAvatar"]:checked')?.value || 'classic';
         const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
         const errEl = document.getElementById('joinError');
         
@@ -366,6 +455,7 @@
             const fd = new FormData();
             fd.append('room_code', code);
             fd.append('sender_name', name);
+            fd.append('avatar', avatar);
             
             const response = await fetch('{% url "join_room" %}', {
                 method: 'POST',

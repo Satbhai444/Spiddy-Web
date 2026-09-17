@@ -73,18 +73,30 @@
         height: 170,
     });
 
-    async function copyText(text, button, okText) {
-        await navigator.clipboard.writeText(text);
-        const original = button.textContent;
-        button.textContent = okText;
-        setTimeout(() => { button.textContent = original; }, 1600);
+    async function copyText(text, button, okText, toastMsg) {
+        try {
+            await navigator.clipboard.writeText(text);
+            const original = button.innerHTML;
+            button.innerHTML = `✓ ${okText}`;
+            button.classList.add('bg-green-600', 'border-green-400');
+            if (window.showSpiderSenseToast) {
+                window.showSpiderSenseToast(toastMsg || `${okText}! 📋`, "COPIED TO CLIPBOARD");
+            }
+            if (window.playThwipSound) window.playThwipSound();
+            setTimeout(() => {
+                button.innerHTML = original;
+                button.classList.remove('bg-green-600', 'border-green-400');
+            }, 1800);
+        } catch (e) {
+            console.error(e);
+        }
     }
 
     if (window.showSpiderSenseToast) {
         window.showSpiderSenseToast("File Uploaded! Share PIN {{ pin }} or QR Code", "SPIDDY DROP");
     }
 
-    document.getElementById('copyPinBtn').addEventListener('click', () => copyText('{{ pin }}', document.getElementById('copyPinBtn'), 'PIN Copied'));
-    document.getElementById('copyLinkBtn').addEventListener('click', () => copyText(shareUrl, document.getElementById('copyLinkBtn'), 'Link Copied'));
+    document.getElementById('copyPinBtn').addEventListener('click', () => copyText('{{ pin }}', document.getElementById('copyPinBtn'), 'PIN Copied', 'PIN {{ pin }} copied to clipboard! 📋'));
+    document.getElementById('copyLinkBtn').addEventListener('click', () => copyText(shareUrl, document.getElementById('copyLinkBtn'), 'Link Copied', 'Share link copied to clipboard! 📋'));
 </script>
 {% endblock %}

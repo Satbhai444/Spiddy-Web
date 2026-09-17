@@ -29,8 +29,19 @@ def _fmt_size(b):
     if b < 1048576: return f"{b/1024:.1f} KB"
     return f"{b/1048576:.2f} MB"
 
-def _is_previewable_image(filename):
-    return os.path.splitext(filename.lower())[1] in {'.png', '.jpg', '.jpeg', '.gif', '.webp'}
+def _get_preview_type(filename):
+    ext = os.path.splitext(filename.lower())[1]
+    if ext in {'.png', '.jpg', '.jpeg', '.gif', '.webp', '.svg'}:
+        return 'image'
+    elif ext in {'.mp4', '.webm', '.mov', '.ogg'}:
+        return 'video'
+    elif ext in {'.mp3', '.wav', '.ogg', '.m4a', '.flac'}:
+        return 'audio'
+    elif ext == '.pdf':
+        return 'pdf'
+    elif ext in {'.txt', '.py', '.js', '.json', '.css', '.html', '.md', '.csv', '.log'}:
+        return 'text'
+    return None
 
 def _delete_expired(drop):
     if drop.file and os.path.exists(drop.file.path):
@@ -61,6 +72,7 @@ def _record_failed_pin(ip):
 def _file_info_from_drop(drop):
     remaining_ms = int((drop.get_expiry() - timezone.now()).total_seconds() * 1000)
     name = drop.original_filename or os.path.basename(drop.file.name)
+    preview_type = _get_preview_type(name)
     return {
         'pin': drop.pin,
         'name': name,
@@ -69,7 +81,8 @@ def _file_info_from_drop(drop):
         'one_time': drop.one_time,
         'has_password': bool(drop.password),
         'download_count': drop.download_count,
-        'previewable': _is_previewable_image(name),
+        'previewable': bool(preview_type),
+        'preview_type': preview_type,
     }
 
 def home_view(request):
@@ -259,10 +272,13 @@ def file_preview_view(request, pin):
         _delete_expired(drop)
         return HttpResponse('Expired', status=410)
     filename = drop.original_filename or os.path.basename(drop.file.name)
-    if not _is_previewable_image(filename):
+    preview_type = _get_preview_type(filename)
+    if not preview_type:
         return HttpResponse('Preview not available', status=415)
     content_type, _ = mimetypes.guess_type(filename)
-    return FileResponse(drop.file.open('rb'), content_type=content_type or 'application/octet-stream')
+    response = FileResponse(drop.file.open('rb'), content_type=content_type or 'application/octet-stream')
+    response['Content-Disposition'] = f'inline; filename="{filename}"'
+    return response
 
 def download_view(request):
     error = None
@@ -432,6 +448,7 @@ import json
 def create_room_view(request):
     if request.method == 'POST':
         sender_name = request.POST.get('sender_name', '').strip()
+        avatar = request.POST.get('avatar', 'classic').strip()
         if not sender_name:
             return JsonResponse({'status': 'error', 'message': 'Name is required'})
         
@@ -441,11 +458,13 @@ def create_room_view(request):
         # Save credentials in session
         request.session['room_code'] = room.code
         request.session['sender_name'] = sender_name
+        request.session['avatar'] = avatar
         
         # Create a system message welcoming the user
         RoomMessage.objects.create(
             room=room,
             sender_name='System (K.A.R.E.N)',
+            avatar='karen',
             text_content=f"{sender_name} has created the web room! Share the code {room.code} with your friends."
         )
         
@@ -456,6 +475,7 @@ def join_room_view(request):
     if request.method == 'POST':
         room_code = request.POST.get('room_code', '').strip().upper()
         sender_name = request.POST.get('sender_name', '').strip()
+        avatar = request.POST.get('avatar', 'classic').strip()
         
         if not room_code or not sender_name:
             return JsonResponse({'status': 'error', 'message': 'Room code and Name are required'})
@@ -471,10 +491,12 @@ def join_room_view(request):
             
         request.session['room_code'] = room.code
         request.session['sender_name'] = sender_name
+        request.session['avatar'] = avatar
         
         RoomMessage.objects.create(
             room=room,
             sender_name='System (K.A.R.E.N)',
+            avatar='karen',
             text_content=f"{sender_name} just swung into the room!"
         )
         
@@ -493,6 +515,7 @@ def room_chat_view(request, room_code):
         
     session_code = request.session.get('room_code')
     sender_name = request.session.get('sender_name')
+    avatar = request.session.get('avatar', 'classic')
     
     # If not authenticated for this room, redirect to home
     if session_code != room_code or not sender_name:
@@ -500,15 +523,36 @@ def room_chat_view(request, room_code):
         
     return render(request, 'drop/room.html', {
         'room': room,
-        'sender_name': sender_name
+        'sender_name': sender_name,
+        'avatar': avatar
     })
+
+def _safe_cache_key(prefix, room_code, name):
+    import hashlib
+    h = hashlib.md5((name or '').encode('utf-8')).hexdigest()[:12]
+    return f'{prefix}_{room_code}_{h}'
+
+def _normalize_reactions(reactions):
+    normalized = {}
+    for emoji, users in (reactions or {}).items():
+        norm_list = []
+        for u in users:
+            if isinstance(u, dict):
+                norm_list.append(u)
+            else:
+                norm_list.append({'name': str(u), 'avatar': 'classic'})
+        if norm_list:
+            normalized[emoji] = norm_list
+    return normalized
 
 def api_send_message(request, room_code):
     if request.method == 'POST':
         session_code = request.session.get('room_code')
-        sender_name = request.session.get('sender_name')
+        sender_name = request.headers.get('X-Sender-Name') or request.POST.get('sender_name') or request.session.get('sender_name')
+        avatar = request.POST.get('avatar') or request.session.get('avatar', 'classic')
+        is_voice_note = request.POST.get('is_voice_note') in ['1', 'true', 'True', True]
         
-        if session_code != room_code or not sender_name:
+        if (session_code and session_code != room_code) or not sender_name:
             return JsonResponse({'status': 'error', 'message': 'Unauthorized'}, status=403)
             
         try:
@@ -518,6 +562,7 @@ def api_send_message(request, room_code):
             
         text_content = request.POST.get('text_content', '').strip()
         uploaded_file = request.FILES.get('file')
+        reply_to_id = request.POST.get('reply_to_id')
         
         if not text_content and not uploaded_file:
             return JsonResponse({'status': 'error', 'message': 'Cannot send empty message'})
@@ -526,13 +571,26 @@ def api_send_message(request, room_code):
         if uploaded_file:
             original_filename = uploaded_file.name
             
+        reply_msg = None
+        if reply_to_id:
+            try:
+                reply_msg = RoomMessage.objects.filter(id=int(reply_to_id), room=room).first()
+            except (ValueError, TypeError):
+                reply_msg = None
+
         RoomMessage.objects.create(
             room=room,
             sender_name=sender_name,
+            avatar=avatar,
             text_content=text_content,
             file=uploaded_file,
-            original_filename=original_filename
+            original_filename=original_filename,
+            reply_to=reply_msg,
+            is_voice_note=is_voice_note
         )
+        
+        # Clear typing cache for this user since they sent the message
+        cache.delete(_safe_cache_key('typing', room_code, sender_name))
         
         return JsonResponse({'status': 'success'})
     return JsonResponse({'status': 'error', 'message': 'Invalid request'})
@@ -540,9 +598,9 @@ def api_send_message(request, room_code):
 def api_get_messages(request, room_code):
     if request.method == 'GET':
         session_code = request.session.get('room_code')
-        sender_name = request.session.get('sender_name')
+        sender_name = request.headers.get('X-Sender-Name') or request.GET.get('sender_name') or request.session.get('sender_name')
         
-        if session_code != room_code or not sender_name:
+        if (session_code and session_code != room_code) or not sender_name:
             return JsonResponse({'status': 'error', 'message': 'Unauthorized'}, status=403)
             
         last_id = request.GET.get('last_id', 0)
@@ -551,21 +609,212 @@ def api_get_messages(request, room_code):
         except ValueError:
             last_id = 0
             
-        messages = RoomMessage.objects.filter(room__code=room_code, id__gt=last_id).order_by('id')
+        messages = RoomMessage.objects.filter(room__code=room_code, id__gt=last_id).select_related('reply_to').order_by('id')
         
         data = []
         for msg in messages:
             file_url = msg.file.url if msg.file else None
+            reply_data = None
+            if msg.reply_to:
+                reply_data = {
+                    'id': msg.reply_to.id,
+                    'sender_name': msg.reply_to.sender_name,
+                    'text': (msg.reply_to.text_content[:80] + '...') if msg.reply_to.text_content and len(msg.reply_to.text_content) > 80 else (msg.reply_to.text_content or ''),
+                    'is_file': bool(msg.reply_to.file),
+                    'filename': msg.reply_to.original_filename or '',
+                    'is_voice_note': msg.reply_to.is_voice_note,
+                    'is_me': msg.reply_to.sender_name == sender_name
+                }
             data.append({
                 'id': msg.id,
                 'sender_name': msg.sender_name,
+                'avatar': msg.avatar or 'classic',
                 'text_content': msg.text_content,
                 'file_url': file_url,
                 'original_filename': msg.original_filename,
+                'is_voice_note': msg.is_voice_note,
+                'is_deleted': msg.is_deleted,
                 'created_at': msg.created_at.strftime("%I:%M %p"),
                 'is_me': msg.sender_name == sender_name,
-                'is_system': msg.sender_name == 'System (K.A.R.E.N)'
+                'is_system': msg.sender_name == 'System (K.A.R.E.N)',
+                'reply_to': reply_data,
+                'reactions': _normalize_reactions(msg.reactions)
             })
             
-        return JsonResponse({'status': 'success', 'messages': data})
+        # Real-time sync: Return reactions & deleted state map for recent messages so all participants update instantly
+        recent_active = RoomMessage.objects.filter(room__code=room_code).order_by('-id')[:60]
+        reactions_map = {
+            m.id: {
+                'reactions': _normalize_reactions(m.reactions),
+                'is_deleted': m.is_deleted,
+                'text_content': m.text_content if m.is_deleted else None
+            }
+            for m in recent_active
+        }
+
+        # Get active typers
+        typers_list = cache.get(f'room_typers_{room_code}') or []
+        active_typers = []
+        for t in typers_list:
+            if t != sender_name and cache.get(_safe_cache_key('typing', room_code, t)):
+                active_typers.append(t)
+
+        return JsonResponse({
+            'status': 'success', 
+            'messages': data,
+            'reactions_map': reactions_map,
+            'active_typers': active_typers
+        })
     return JsonResponse({'status': 'error', 'message': 'Invalid request'})
+
+def api_toggle_reaction(request, room_code, message_id):
+    if request.method == 'POST':
+        session_code = request.session.get('room_code')
+        sender_name = request.headers.get('X-Sender-Name') or request.POST.get('sender_name') or request.session.get('sender_name')
+        avatar = request.POST.get('avatar') or request.session.get('avatar', 'classic')
+        
+        if (session_code and session_code != room_code) or not sender_name:
+            return JsonResponse({'status': 'error', 'message': 'Unauthorized'}, status=403)
+            
+        try:
+            msg = RoomMessage.objects.get(id=message_id, room__code=room_code)
+        except RoomMessage.DoesNotExist:
+            return JsonResponse({'status': 'error', 'message': 'Message not found'}, status=404)
+            
+        if msg.is_deleted:
+            return JsonResponse({'status': 'error', 'message': 'Cannot react to deleted message'}, status=400)
+
+        emoji = request.POST.get('emoji', '').strip()
+        allowed_emojis = {'🕸️', '🕷️', '❤️', '🔥', '😂', '⚡'}
+        if emoji not in allowed_emojis:
+            return JsonResponse({'status': 'error', 'message': 'Invalid emoji'}, status=400)
+            
+        reactions = dict(msg.reactions or {})
+        user_list = list(reactions.get(emoji, []))
+        
+        # Check if already reacted
+        existing_idx = -1
+        for idx, u in enumerate(user_list):
+            u_name = u['name'] if isinstance(u, dict) else str(u)
+            if u_name.strip().lower() == sender_name.strip().lower():
+                existing_idx = idx
+                break
+                
+        if existing_idx >= 0:
+            user_list.pop(existing_idx)
+            if not user_list:
+                reactions.pop(emoji, None)
+            else:
+                reactions[emoji] = user_list
+        else:
+            user_list.append({'name': sender_name, 'avatar': avatar})
+            reactions[emoji] = user_list
+            
+        msg.reactions = reactions
+        msg.save(update_fields=['reactions'])
+        
+        return JsonResponse({'status': 'success', 'reactions': _normalize_reactions(reactions)})
+    return JsonResponse({'status': 'error', 'message': 'Invalid request'}, status=405)
+
+def api_delete_message(request, room_code, message_id):
+    if request.method == 'POST':
+        session_code = request.session.get('room_code')
+        sender_name = request.headers.get('X-Sender-Name') or request.POST.get('sender_name') or request.session.get('sender_name')
+        
+        if (session_code and session_code != room_code) or not sender_name:
+            return JsonResponse({'status': 'error', 'message': 'Unauthorized'}, status=403)
+            
+        try:
+            msg = RoomMessage.objects.get(id=message_id, room__code=room_code)
+        except RoomMessage.DoesNotExist:
+            return JsonResponse({'status': 'error', 'message': 'Message not found'}, status=404)
+            
+        if msg.sender_name.strip().lower() != sender_name.strip().lower():
+            return JsonResponse({'status': 'error', 'message': 'Permission denied: only author can delete'}, status=403)
+            
+        msg.is_deleted = True
+        msg.text_content = 'This message was deleted'
+        msg.file = None
+        msg.original_filename = None
+        msg.reactions = {}
+        msg.save(update_fields=['is_deleted', 'text_content', 'file', 'original_filename', 'reactions'])
+        
+        return JsonResponse({'status': 'success'})
+    return JsonResponse({'status': 'error', 'message': 'Invalid request'}, status=405)
+
+def api_typing_indicator(request, room_code):
+    if request.method == 'POST':
+        sender_name = request.headers.get('X-Sender-Name') or request.POST.get('sender_name') or request.session.get('sender_name')
+        if not sender_name:
+            return JsonResponse({'status': 'error', 'message': 'Unauthorized'}, status=403)
+            
+        cache.set(_safe_cache_key('typing', room_code, sender_name), sender_name, timeout=4)
+        typers = set(cache.get(f'room_typers_{room_code}') or [])
+        typers.add(sender_name)
+        cache.set(f'room_typers_{room_code}', list(typers), timeout=15)
+        
+        return JsonResponse({'status': 'success'})
+    return JsonResponse({'status': 'error', 'message': 'Invalid request'}, status=405)
+
+def manifest_view(request):
+    manifest_data = {
+        "name": "SPIDDY - Web File Drop & Spider-Verse Chat",
+        "short_name": "SpiddyWeb",
+        "description": "Fast, temporary, encrypted anonymous file sharing & Spider-Verse chat rooms.",
+        "start_url": "/",
+        "display": "standalone",
+        "background_color": "#0f1117",
+        "theme_color": "#dc2626",
+        "orientation": "portrait-primary",
+        "icons": [
+            {
+                "src": "https://raw.githubusercontent.com/Satbhai444/Spiddy-Web/main/drop/static/drop/images/spiderman.png",
+                "sizes": "192x192 512x512",
+                "type": "image/png",
+                "purpose": "any maskable"
+            }
+        ]
+    }
+    return JsonResponse(manifest_data, content_type='application/manifest+json')
+
+def service_worker_view(request):
+    sw_code = """
+const CACHE_NAME = 'spiddy-cache-v1';
+const STATIC_ASSETS = [
+  '/',
+  '/upload/',
+  '/receive/',
+  'https://cdn.tailwindcss.com',
+  'https://raw.githubusercontent.com/Satbhai444/Spiddy-Web/main/drop/static/drop/images/spiderman.png'
+];
+
+self.addEventListener('install', (event) => {
+  event.waitUntil(
+    caches.open(CACHE_NAME).then((cache) => {
+      return cache.addAll(STATIC_ASSETS).catch(() => {});
+    })
+  );
+  self.skipWaiting();
+});
+
+self.addEventListener('activate', (event) => {
+  event.waitUntil(
+    caches.keys().then((keys) => {
+      return Promise.all(
+        keys.filter((key) => key !== CACHE_NAME).map((key) => caches.delete(key))
+      );
+    })
+  );
+  self.clients.claim();
+});
+
+self.addEventListener('fetch', (event) => {
+  if (event.request.method !== 'GET') return;
+  event.respondWith(
+    fetch(event.request).catch(() => {
+      return caches.match(event.request);
+    })
+  );
+});
+"""
+    return HttpResponse(sw_code, content_type='application/javascript')

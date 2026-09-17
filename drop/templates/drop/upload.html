@@ -199,8 +199,12 @@
 
     window.removeSelectedFile = function(index) {
         if (index >= 0 && index < selectedFilesStore.length) {
-            selectedFilesStore.splice(index, 1);
+            const removed = selectedFilesStore.splice(index, 1)[0];
             renderSelectedFilesList();
+            if (window.showSpiderSenseToast && removed) {
+                window.showSpiderSenseToast(`"${removed.name}" removed from queue 🗑️`, "FILE REMOVED");
+            }
+            if (window.playThwipSound) window.playThwipSound();
         }
     };
 

@@ -3,133 +3,480 @@
 
 {% block title %}Spider-Verse Room: {{ room.code }}{% endblock %}
 
-{% block main_class %}w-full flex flex-col items-center justify-center min-h-[calc(100vh-80px)] pt-24 pb-10 px-4{% endblock %}
+{% block main_class %}w-full flex flex-col items-center justify-center min-h-[calc(100vh-80px)] pt-20 pb-8 px-2 sm:px-4{% endblock %}
 
 {% block header %}
-<nav class="fixed top-0 left-0 right-0 z-50 px-6 py-3 flex items-center justify-between"
-    style="background:rgba(15,15,19,0.92); backdrop-filter:blur(12px); border-bottom:1px solid rgba(81,140,202,0.2);">
+<nav class="fixed top-0 left-0 right-0 z-50 px-4 sm:px-6 py-3 flex items-center justify-between"
+    style="background:rgba(15,15,19,0.94); backdrop-filter:blur(14px); border-bottom:1px solid rgba(226,54,54,0.25);">
     <a href="{% url 'home' %}" class="flex items-center gap-2">
         <img src="https://raw.githubusercontent.com/Satbhai444/Spiddy-Web/main/drop/static/drop/images/spiderman.png" alt="Spider-Man" class="h-9 object-contain drop-shadow-[0_0_8px_rgba(226,54,54,0.8)]">
         <span class="spidey-title text-3xl text-white tracking-wide">SPIDDY</span>
     </a>
-    <a href="{% url 'home' %}" class="text-gray-400 hover:text-red-500 font-bold uppercase text-xs tracking-wider transition-colors border border-gray-700 px-3 py-1.5 rounded-lg hover:border-red-500 shadow-sm">
-        Leave Room &times;
-    </a>
+    
+    <div class="flex items-center gap-2.5">
+        <button id="headerCopyCodeBtn" title="Click to copy Room PIN"
+            class="flex items-center gap-1.5 bg-red-950/70 hover:bg-red-900 border border-red-500/50 text-red-300 hover:text-white px-3 py-1.5 rounded-xl text-xs font-mono font-bold tracking-widest transition-all cursor-pointer shadow-sm">
+            <span>PIN: {{ room.code }}</span>
+            <svg class="w-3.5 h-3.5 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
+        </button>
+        <a href="{% url 'home' %}" class="text-gray-400 hover:text-red-500 font-bold uppercase text-xs tracking-wider transition-colors border border-gray-700 px-3 py-1.5 rounded-xl hover:border-red-500 shadow-sm">
+            Leave &times;
+        </a>
+    </div>
 </nav>
 {% endblock %}
 
 {% block content %}
-<!-- Small Window Typed Chatbox -->
-<div class="w-full max-w-2xl bg-gray-900 rounded-3xl overflow-hidden shadow-[0_20px_60px_rgba(226,54,54,0.15)] border border-gray-800 flex flex-col h-[80vh] sm:h-[75vh] min-h-[400px] max-h-[800px] relative mt-4">
+<!-- Main Chat Window (WhatsApp Spider-Verse Edition) -->
+<div class="w-full max-w-2xl bg-[#0f1117] rounded-3xl overflow-hidden shadow-[0_20px_60px_rgba(0,0,0,0.8)] border border-gray-800/80 flex flex-col h-[84vh] sm:h-[80vh] min-h-[480px] max-h-[850px] relative mt-1">
     
     <!-- Chat Header -->
-    <div class="px-5 py-4 bg-gray-800 border-b border-gray-700 flex items-center justify-between shrink-0">
+    <div class="px-4 sm:px-5 py-3 bg-gray-900/90 border-b border-gray-800 flex items-center justify-between shrink-0 backdrop-blur-md z-20">
         <div class="flex items-center gap-3">
-            <div class="w-11 h-11 rounded-full bg-red-600/20 border border-red-500/50 flex items-center justify-center text-xl shadow-[0_0_10px_rgba(226,54,54,0.3)]">
-                🕸️
+            <div id="userAvatarBadge" class="w-10 h-10 rounded-full bg-red-600/20 border border-red-500/50 flex items-center justify-center text-xl shadow-[0_0_10px_rgba(226,54,54,0.3)] shrink-0">
+                🕷️
             </div>
             <div>
-                <h3 class="text-white font-bold text-md leading-tight tracking-wide">Spider-Verse Web</h3>
-                <p class="text-xs text-gray-400">Code: <span class="text-red-400 font-bold tracking-widest">{{ room.code }}</span></p>
+                <h3 class="text-white font-bold text-sm leading-tight tracking-wide flex items-center gap-2">
+                    Spider-Verse Web
+                    <span class="text-[10px] bg-red-500/20 text-red-400 px-1.5 py-0.5 rounded border border-red-500/30 uppercase tracking-widest font-mono">LIVE</span>
+                </h3>
+                <p class="text-xs text-gray-400 flex items-center gap-1">
+                    Room: 
+                    <button id="clickToCopyRoomCode" class="text-red-400 font-bold tracking-widest hover:underline hover:text-red-300 font-mono inline-flex items-center gap-1" title="Copy room code">
+                        <span>{{ room.code }}</span>
+                        <svg class="w-3 h-3 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
+                    </button>
+                </p>
             </div>
         </div>
-        <div class="text-xs text-gray-300 bg-black/40 px-3 py-1.5 rounded-full border border-gray-700 flex items-center gap-2">
-            <div class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
-            {{ sender_name }}
+
+        <!-- Header Actions: Search, Starred, Active User Profile Pill -->
+        <div class="flex items-center gap-1 sm:gap-2">
+            <!-- Search in Chat Button -->
+            <button onclick="toggleSearchBar()" class="p-2 text-gray-400 hover:text-white hover:bg-gray-800/80 rounded-full transition-colors text-sm" title="Search messages">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+            </button>
+            
+            <!-- Starred Messages Button -->
+            <button onclick="openStarredModal()" class="p-2 text-yellow-400 hover:text-yellow-300 hover:bg-gray-800/80 rounded-full transition-colors text-sm" title="Starred Messages">
+                ⭐
+            </button>
+
+            <!-- Active User Profile Pill -->
+            <div class="text-xs text-gray-300 bg-black/50 px-2.5 sm:px-3 py-1.5 rounded-full border border-gray-800 flex items-center gap-1.5 sm:gap-2 shadow-inner">
+                <span id="currentAvatarEmoji" class="text-sm">🔴</span>
+                <span class="font-semibold text-white truncate max-w-[80px] sm:max-w-[120px]">{{ sender_name }}</span>
+                <div class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
+            </div>
         </div>
     </div>
 
-    <!-- Chat Messages -->
-    <div class="flex-1 overflow-y-auto overflow-x-hidden p-4 sm:p-6 flex flex-col gap-4" id="chatContainer" style="background: url('https://raw.githubusercontent.com/Satbhai444/Spiddy-Web/main/drop/static/drop/images/spiderman.png') center/40% no-repeat; background-blend-mode: overlay; background-color: rgba(15,15,19,0.96);">
-        <div class="flex flex-col gap-4" id="messagesList">
+    <!-- In-Chat Search Bar (Slides down from Chat Header) -->
+    <div id="searchBarContainer" class="hidden px-4 py-2 bg-gray-950/95 border-b border-gray-800 flex items-center gap-2 z-20 transition-all backdrop-blur-md">
+        <div class="flex-1 relative flex items-center">
+            <svg class="w-3.5 h-3.5 text-gray-500 absolute left-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+            <input type="text" id="chatSearchInput" oninput="handleSearchInput()" placeholder="Search in chat..." class="w-full bg-gray-900 border border-gray-700/80 rounded-xl pl-8 pr-3 py-1.5 text-xs text-white placeholder-gray-500 focus:outline-none focus:border-red-500">
+        </div>
+        <span id="searchMatchCount" class="text-[11px] text-gray-400 font-mono shrink-0">0/0</span>
+        <button onclick="navigateSearch(-1)" class="p-1 hover:text-white text-gray-400 rounded hover:bg-gray-800 shrink-0" title="Previous match">&uarr;</button>
+        <button onclick="navigateSearch(1)" class="p-1 hover:text-white text-gray-400 rounded hover:bg-gray-800 shrink-0" title="Next match">&darr;</button>
+        <button onclick="closeSearchBar()" class="p-1 hover:text-red-400 text-gray-400 rounded hover:bg-gray-800 text-base leading-none shrink-0" title="Close search">&times;</button>
+    </div>
+
+    <!-- Chat Messages Container -->
+    <div class="flex-1 overflow-y-auto overflow-x-hidden p-3 sm:p-4 flex flex-col gap-2 custom-scrollbar relative" id="chatContainer"
+        style="background: radial-gradient(circle at center, rgba(30,15,20,0.85) 0%, rgba(10,10,14,0.98) 100%), url('https://raw.githubusercontent.com/Satbhai444/Spiddy-Web/main/drop/static/drop/images/spiderman.png') center/35% no-repeat; background-blend-mode: overlay;">
+        
+        <!-- Welcome banner -->
+        <div class="self-center my-2 text-center">
+            <span class="bg-gray-800/80 backdrop-blur-sm text-gray-400 text-[11px] px-3.5 py-1 rounded-full border border-gray-700/60 shadow-sm inline-flex items-center gap-1.5">
+                🔒 Messages are end-to-room encrypted & self-destruct with room
+            </span>
+        </div>
+
+        <div class="flex flex-col gap-2 w-full" id="messagesList">
             <!-- Messages will be injected here -->
         </div>
+
+        <!-- Live Typing Indicator Banner -->
+        <div id="typingIndicator" class="hidden text-xs text-red-400 items-center gap-2 px-3 py-1.5 my-1 bg-gray-900/60 backdrop-blur-sm rounded-full w-fit border border-red-500/20">
+            <span>🕸️</span>
+            <span id="typingText" class="font-medium"></span>
+            <span class="inline-flex gap-1 ml-1">
+                <span class="w-1.5 h-1.5 rounded-full bg-red-400 animate-bounce" style="animation-delay: 0ms"></span>
+                <span class="w-1.5 h-1.5 rounded-full bg-red-400 animate-bounce" style="animation-delay: 150ms"></span>
+                <span class="w-1.5 h-1.5 rounded-full bg-red-400 animate-bounce" style="animation-delay: 300ms"></span>
+            </span>
+        </div>
     </div>
 
-    <!-- Attachment preview overlay -->
-    <div id="filePreview" class="hidden absolute bottom-[76px] left-4 right-4 bg-gray-800/95 backdrop-blur-md border border-gray-600 p-3 rounded-2xl items-center justify-between shadow-2xl z-10 transform transition-all">
-        <div class="flex items-center gap-3 overflow-hidden">
-            <div class="w-10 h-10 rounded-lg bg-blue-600/20 flex items-center justify-center text-xl border border-blue-500/30">📄</div>
-            <div class="flex flex-col truncate">
-                <span class="text-xs text-blue-400 font-bold uppercase tracking-widest">Attached File</span>
-                <span id="fileNameDisplay" class="text-sm text-gray-200 truncate"></span>
+    <!-- Floating Scroll-to-Bottom Button with Unread Counter -->
+    <button id="scrollToBottomBtn" onclick="scrollToChatBottom()" 
+        class="hidden absolute right-4 bottom-22 z-30 bg-gray-900/95 hover:bg-gray-800 border border-gray-700 text-white p-2.5 rounded-full shadow-2xl transition-all hover:scale-110 active:scale-95 flex items-center justify-center cursor-pointer">
+        <svg class="w-4 h-4 text-gray-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path></svg>
+        <span id="unreadCounterBadge" class="hidden absolute -top-1.5 -left-1.5 bg-red-600 text-white text-[10px] font-bold px-1.5 py-0.2 rounded-full border border-gray-900 shadow">0</span>
+    </button>
+
+    <!-- WhatsApp-style Reply Preview Bar (Attached above input) -->
+    <div id="replyPreview" class="hidden bg-gray-900/98 backdrop-blur-md border-t border-gray-700/80 px-4 py-2.5 items-center justify-between transition-all duration-200 shadow-xl z-20">
+        <div class="flex items-start gap-3 border-l-4 border-l-red-500 pl-3 overflow-hidden min-w-0 flex-1">
+            <div class="flex flex-col truncate w-full">
+                <div class="flex items-center gap-1.5">
+                    <svg class="w-3.5 h-3.5 text-red-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"></path></svg>
+                    <span id="replySenderDisplay" class="text-xs font-bold text-red-400 truncate">Replying to message</span>
+                </div>
+                <span id="replyTextDisplay" class="text-xs text-gray-300 truncate italic mt-0.5"></span>
             </div>
         </div>
-        <button id="clearFileBtn" class="text-gray-400 hover:text-red-500 font-bold p-2 text-xl">&times;</button>
+        <button id="clearReplyBtn" class="text-gray-400 hover:text-red-400 font-bold p-1 rounded-full hover:bg-gray-800 transition-colors text-lg w-7 h-7 flex items-center justify-center shrink-0 ml-2" title="Cancel Reply">&times;</button>
     </div>
 
-    <!-- Reply Preview Overlay -->
-    <div id="replyPreview" class="hidden absolute bottom-[76px] left-4 right-4 bg-gray-800/95 backdrop-blur-md border-l-4 border-l-red-500 border-t border-b border-r border-gray-700 p-3 rounded-xl items-center justify-between shadow-2xl z-10 transform transition-all">
-        <div class="flex flex-col truncate w-full pr-4">
-            <span class="text-xs text-red-400 font-bold uppercase tracking-widest mb-1">Replying to message</span>
-            <span id="replyTextDisplay" class="text-sm text-gray-300 truncate italic"></span>
+    <!-- Attachment Preview Overlay -->
+    <div id="filePreview" class="hidden bg-gray-900/98 backdrop-blur-md border-t border-blue-500/50 px-4 py-2.5 items-center justify-between shadow-xl z-20">
+        <div class="flex items-center gap-3 overflow-hidden">
+            <div class="w-9 h-9 rounded-lg bg-blue-600/20 flex items-center justify-center text-lg border border-blue-500/30 shrink-0">📄</div>
+            <div class="flex flex-col truncate">
+                <span class="text-[10px] text-blue-400 font-bold uppercase tracking-widest">Attached File</span>
+                <span id="fileNameDisplay" class="text-xs text-gray-200 font-medium truncate"></span>
+            </div>
         </div>
-        <button id="clearReplyBtn" class="text-gray-400 hover:text-red-500 font-bold p-2 text-xl">&times;</button>
+        <button id="clearFileBtn" class="text-gray-400 hover:text-red-500 font-bold p-1 rounded-full hover:bg-gray-800 text-lg w-7 h-7 flex items-center justify-center shrink-0" title="Remove attachment">&times;</button>
     </div>
 
-    <!-- Chat Input Area -->
-    <div class="shrink-0 p-3 bg-gray-800 border-t border-gray-700 z-20">
-        <div class="flex gap-2 items-end">
-            <button id="attachBtn" class="p-3 text-gray-400 hover:text-red-400 transition-colors shrink-0" title="Attach File">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"></path></svg>
+    <!-- Chat Input Area (WhatsApp Style) -->
+    <div class="shrink-0 p-3 bg-gray-900 border-t border-gray-800 z-20">
+        <div class="flex gap-2 items-end" id="normalInputBar">
+            <button id="attachBtn" class="p-3 text-gray-400 hover:text-red-400 hover:bg-gray-800 rounded-full transition-colors shrink-0" title="Attach File / Photo">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"></path></svg>
             </button>
             <input type="file" id="fileInput" class="hidden">
             
-            <textarea id="messageInput" rows="1" placeholder="Type a message..." class="flex-1 bg-gray-900 border border-gray-700 rounded-2xl px-4 py-3 text-white text-sm focus:outline-none focus:border-red-500 transition-colors resize-none overflow-y-auto" style="min-height: 48px; max-height: 120px;"></textarea>
+            <textarea id="messageInput" rows="1" placeholder="Type a message..." class="flex-1 bg-gray-800/90 border border-gray-700/80 rounded-2xl px-4 py-3 text-white text-sm focus:outline-none focus:border-red-500 focus:ring-1 focus:ring-red-500 transition-all resize-none overflow-y-auto" style="min-height: 46px; max-height: 120px;"></textarea>
             
-            <button id="sendBtn" class="bg-red-600 hover:bg-red-500 text-white p-3 rounded-full transition-transform transform hover:scale-105 shrink-0 shadow-[0_0_15px_rgba(226,54,54,0.4)]" title="Send">
+            <!-- Send Button (shown when text or file present) -->
+            <button id="sendBtn" class="hidden bg-red-600 hover:bg-red-500 active:scale-95 text-white p-3 rounded-full transition-transform transform shrink-0 shadow-[0_0_15px_rgba(226,54,54,0.4)] flex items-center justify-center w-11 h-11" title="Send (Enter)">
                 <svg class="w-5 h-5 ml-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path></svg>
+            </button>
+
+            <!-- Mic Button (WhatsApp Audio Record, shown when textarea is empty) -->
+            <button id="recordMicBtn" onclick="startVoiceRecording()" class="bg-red-600 hover:bg-red-500 active:scale-95 text-white p-3 rounded-full transition-transform transform shrink-0 shadow-[0_0_15px_rgba(226,54,54,0.4)] flex items-center justify-center w-11 h-11" title="Record Voice Note">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"></path></svg>
+            </button>
+        </div>
+
+        <!-- WhatsApp Voice Recording Active Bar -->
+        <div id="voiceRecordingBar" class="hidden flex items-center justify-between gap-3 px-3 py-2 bg-red-950/40 border border-red-500/50 rounded-2xl">
+            <div class="flex items-center gap-2.5">
+                <span class="w-3 h-3 rounded-full bg-red-500 animate-ping"></span>
+                <span id="recordingTimer" class="font-mono text-sm font-bold text-red-400">0:00</span>
+                <span class="text-xs text-gray-300 ml-1 italic">Recording voice note...</span>
+            </div>
+            <div class="flex items-center gap-2">
+                <button onclick="cancelVoiceRecording()" class="p-2 text-gray-400 hover:text-red-400 hover:bg-black/40 rounded-full transition-colors" title="Cancel recording">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                </button>
+                <button onclick="stopAndSendVoiceRecording()" class="bg-red-600 hover:bg-red-500 text-white p-2.5 rounded-full transition-transform active:scale-95 shadow-lg flex items-center justify-center w-10 h-10" title="Send voice note">
+                    <svg class="w-4 h-4 ml-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path></svg>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Custom WhatsApp Context Menu -->
+<div id="contextMenu" class="hidden fixed z-[100] bg-[#1a1d24] border border-gray-700 shadow-[0_12px_40px_rgba(0,0,0,0.85)] rounded-2xl py-1.5 w-52 overflow-hidden text-gray-200 backdrop-blur-lg select-none">
+    <button onclick="handleMenuAction('reply')" class="w-full text-left px-4 py-2.5 hover:bg-red-600/20 hover:text-white text-xs font-semibold flex items-center gap-3 transition-colors">
+        <svg class="w-4 h-4 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"></path></svg> 
+        Reply
+    </button>
+    <button onclick="handleMenuAction('star')" id="menuStarBtn" class="w-full text-left px-4 py-2.5 hover:bg-yellow-500/20 hover:text-white text-xs font-semibold flex items-center gap-3 transition-colors">
+        <span class="text-sm text-yellow-400">⭐</span> 
+        <span id="menuStarText">Star message</span>
+    </button>
+    <button onclick="handleMenuAction('copy')" class="w-full text-left px-4 py-2.5 hover:bg-blue-600/20 hover:text-white text-xs font-semibold flex items-center gap-3 transition-colors">
+        <svg class="w-4 h-4 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg> 
+        Copy Text
+    </button>
+    <div class="h-px bg-gray-800 my-1"></div>
+    <button onclick="handleMenuAction('delete')" class="w-full text-left px-4 py-2.5 hover:bg-red-950/80 text-xs font-semibold flex items-center gap-3 text-red-400 hover:text-red-300 transition-colors">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg> 
+        Delete message
+    </button>
+</div>
+
+<!-- Fullscreen Spider-Verse Lightbox Modal -->
+<div id="lightboxModal" class="hidden fixed inset-0 z-[9999] bg-black/95 backdrop-blur-xl flex flex-col items-center justify-center p-4 transition-all duration-300">
+    <div class="absolute top-4 right-4 flex items-center gap-3 z-10">
+        <a id="lightboxDownloadBtn" href="#" download class="bg-red-600 hover:bg-red-500 text-white px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider flex items-center gap-2 shadow-lg transition-all">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg> Download
+        </a>
+        <button onclick="closeLightbox()" class="text-gray-400 hover:text-white p-2 rounded-full hover:bg-gray-800 text-2xl w-10 h-10 flex items-center justify-center transition-colors">&times;</button>
+    </div>
+    <div class="max-w-4xl max-h-[85vh] flex flex-col items-center justify-center">
+        <img id="lightboxImg" src="" class="max-w-full max-h-[78vh] object-contain rounded-2xl shadow-[0_0_50px_rgba(226,54,54,0.3)] border border-gray-800">
+        <p id="lightboxCaption" class="text-xs text-gray-300 mt-3 font-semibold text-center truncate max-w-md"></p>
+    </div>
+</div>
+
+<!-- WhatsApp Reaction Details Sheet Modal -->
+<div id="reactionSheetModal" class="hidden fixed inset-0 z-[10000] bg-black/75 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-4">
+    <div class="bg-[#181b22] border border-gray-800 rounded-t-3xl sm:rounded-2xl w-full max-w-md max-h-[75vh] flex flex-col overflow-hidden shadow-2xl animate-in slide-in-from-bottom duration-200">
+        <!-- Sheet Header with Tabs -->
+        <div class="px-4 pt-4 pb-2 border-b border-gray-800/80">
+            <div class="flex items-center justify-between mb-3">
+                <h4 class="text-sm font-bold text-white tracking-wide flex items-center gap-2">
+                    <span>Reactions</span>
+                </h4>
+                <button onclick="closeReactionSheet()" class="text-gray-400 hover:text-white text-xl p-1 rounded-full hover:bg-gray-800">&times;</button>
+            </div>
+            <!-- Reaction Tabs (All, ❤️, 🕸️...) -->
+            <div id="reactionTabsContainer" class="flex gap-2 overflow-x-auto pb-1 custom-scrollbar">
+                <!-- Injected dynamically -->
+            </div>
+        </div>
+        <!-- User list for active tab -->
+        <div id="reactionUserList" class="p-3 overflow-y-auto max-h-[50vh] space-y-2 custom-scrollbar">
+            <!-- Injected dynamically -->
+        </div>
+    </div>
+</div>
+
+<!-- Delete Options Modal ("Delete for Everyone" vs "Delete for Me") -->
+<div id="deleteModal" class="hidden fixed inset-0 z-[10000] bg-black/75 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-[#1a1d24] border border-gray-700 rounded-2xl w-full max-w-xs p-5 shadow-2xl space-y-3">
+        <h4 class="text-sm font-bold text-white text-center">Delete message?</h4>
+        <p class="text-xs text-gray-400 text-center">Choose whether to delete this message for everyone in the room or only from your view.</p>
+        <div class="pt-2 flex flex-col gap-2">
+            <button id="btnDeleteForEveryone" onclick="confirmDeleteForEveryone()" class="w-full py-2.5 px-3 rounded-xl bg-red-600 hover:bg-red-500 text-white font-bold text-xs uppercase tracking-wider transition-colors shadow">
+                Delete for Everyone
+            </button>
+            <button id="btnDeleteForMe" onclick="confirmDeleteForMe()" class="w-full py-2.5 px-3 rounded-xl bg-gray-800 hover:bg-gray-700 text-gray-200 font-bold text-xs uppercase tracking-wider transition-colors">
+                Delete for Me
+            </button>
+            <button onclick="closeDeleteModal()" class="w-full py-2 px-3 rounded-xl text-gray-400 hover:text-white text-xs font-semibold">
+                Cancel
             </button>
         </div>
     </div>
 </div>
 
-<!-- Custom Context Menu -->
-<div id="contextMenu" class="hidden fixed z-[100] bg-[#232626] border border-[#303333] shadow-[0_10px_40px_rgba(0,0,0,0.8)] rounded-xl py-2 w-48 overflow-hidden text-gray-200">
-    <button onclick="handleMenuAction('reply')" class="w-full text-left px-4 py-2.5 hover:bg-[#111b21] text-sm flex items-center gap-3 transition-colors">
-        <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"></path></svg> Reply
-    </button>
-    <button onclick="handleMenuAction('copy')" class="w-full text-left px-4 py-2.5 hover:bg-[#111b21] text-sm flex items-center gap-3 transition-colors">
-        <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg> Copy
-    </button>
-    <hr class="border-[#303333] my-1">
-    <button onclick="handleMenuAction('delete')" class="w-full text-left px-4 py-2.5 hover:bg-[#111b21] text-sm flex items-center gap-3 text-red-400 transition-colors">
-        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg> Delete for me
-    </button>
+<!-- Starred Messages Modal -->
+<div id="starredModal" class="hidden fixed inset-0 z-[10000] bg-black/75 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-[#181b22] border border-gray-800 rounded-2xl w-full max-w-md max-h-[80vh] flex flex-col overflow-hidden shadow-2xl">
+        <div class="px-4 py-3 border-b border-gray-800 flex items-center justify-between">
+            <h4 class="text-sm font-bold text-yellow-400 flex items-center gap-1.5">
+                <span>⭐</span> Starred Messages
+            </h4>
+            <button onclick="closeStarredModal()" class="text-gray-400 hover:text-white text-xl">&times;</button>
+        </div>
+        <div id="starredList" class="p-3 overflow-y-auto space-y-2.5 custom-scrollbar flex-1">
+            <!-- Injected dynamically -->
+        </div>
+    </div>
 </div>
+
+<style>
+.custom-scrollbar::-webkit-scrollbar {
+    width: 6px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 9999px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: rgba(226, 54, 54, 0.4);
+}
+.highlight-flash {
+    animation: flashHighlight 1.5s ease-out;
+}
+@keyframes flashHighlight {
+    0% { transform: scale(1.03); box-shadow: 0 0 0 4px rgba(250, 204, 21, 0.9); }
+    50% { transform: scale(1.01); box-shadow: 0 0 0 3px rgba(250, 204, 21, 0.5); }
+    100% { transform: scale(1); box-shadow: none; }
+}
+</style>
 
 <script>
     const roomCode = "{{ room.code }}";
+    const mySenderName = "{{ sender_name|escapejs }}";
+    let myAvatar = "{{ avatar|default:'classic'|escapejs }}";
     const apiSendUrl = `/room/${roomCode}/send/`;
     const apiGetUrl = `/room/${roomCode}/messages/`;
+    const apiTypingUrl = `/room/${roomCode}/typing/`;
     const csrfToken = "{{ csrf_token }}";
     
-    let lastMessageId = 0;
+    // Avatar presets & emojis
+    const AVATARS = {
+        'classic': { name: 'Peter Parker', emoji: '🔴', color: '#ef4444' },
+        'miles': { name: 'Miles Morales', emoji: '🖤', color: '#f87171' },
+        'gwen': { name: 'Spider-Gwen', emoji: '💖', color: '#ec4899' },
+        'punk': { name: 'Spider-Punk', emoji: '🎸', color: '#a855f7' },
+        '2099': { name: 'Spider-Man 2099', emoji: '🦾', color: '#06b6d4' },
+        'karen': { name: 'K.A.R.E.N', emoji: '🤖', color: '#eab308' }
+    };
     
+    // Set current user header avatar emoji
+    const currentAvatarData = AVATARS[myAvatar] || AVATARS['classic'];
+    const currentAvatarEl = document.getElementById('currentAvatarEmoji');
+    if (currentAvatarEl) currentAvatarEl.textContent = currentAvatarData.emoji;
+    
+    sessionStorage.setItem(`spiddy_name_${roomCode}`, mySenderName);
+    sessionStorage.setItem(`spiddy_avatar_${roomCode}`, myAvatar);
+    
+    let lastMessageId = 0;
+    const DELETED_STORAGE_KEY = `spiddy_deleted_${roomCode}`;
+    const STARRED_STORAGE_KEY = `spiddy_starred_${roomCode}`;
+    
+    function getDeletedIds() {
+        try {
+            return new Set(JSON.parse(localStorage.getItem(DELETED_STORAGE_KEY) || '[]'));
+        } catch {
+            return new Set();
+        }
+    }
+    function saveDeletedId(id) {
+        const set = getDeletedIds();
+        set.add(Number(id));
+        localStorage.setItem(DELETED_STORAGE_KEY, JSON.stringify(Array.from(set)));
+    }
+
+    function getStarredIds() {
+        try {
+            return new Set(JSON.parse(localStorage.getItem(STARRED_STORAGE_KEY) || '[]'));
+        } catch {
+            return new Set();
+        }
+    }
+    function toggleStarred(id) {
+        const set = getStarredIds();
+        const numId = Number(id);
+        const wasStarred = set.has(numId);
+        if (wasStarred) set.delete(numId);
+        else set.add(numId);
+        localStorage.setItem(STARRED_STORAGE_KEY, JSON.stringify(Array.from(set)));
+        updateStarBadge(numId, !wasStarred);
+        if (window.showSpiderSenseToast) {
+            window.showSpiderSenseToast(!wasStarred ? "Message starred! ⭐" : "Message unstarred", "STARRED");
+        }
+        if (window.playThwipSound) window.playThwipSound();
+    }
+    function updateStarBadge(id, isStarred) {
+        const badge = document.getElementById(`star-badge-${id}`);
+        if (!badge) return;
+        if (isStarred) badge.classList.remove('hidden');
+        else badge.classList.add('hidden');
+    }
+
+    // Reaction Cache: msgId -> normalized reactions dictionary
+    const messagesReactionsData = {};
+
     const messagesList = document.getElementById('messagesList');
     const chatContainer = document.getElementById('chatContainer');
     const messageInput = document.getElementById('messageInput');
     const sendBtn = document.getElementById('sendBtn');
+    const recordMicBtn = document.getElementById('recordMicBtn');
     const attachBtn = document.getElementById('attachBtn');
     const fileInput = document.getElementById('fileInput');
     const filePreview = document.getElementById('filePreview');
     const fileNameDisplay = document.getElementById('fileNameDisplay');
     const clearFileBtn = document.getElementById('clearFileBtn');
+    const typingIndicator = document.getElementById('typingIndicator');
+    const typingText = document.getElementById('typingText');
+    const scrollToBottomBtn = document.getElementById('scrollToBottomBtn');
+    const unreadCounterBadge = document.getElementById('unreadCounterBadge');
     
     // Reply functionality state
     const replyPreview = document.getElementById('replyPreview');
+    const replySenderDisplay = document.getElementById('replySenderDisplay');
     const replyTextDisplay = document.getElementById('replyTextDisplay');
     const clearReplyBtn = document.getElementById('clearReplyBtn');
-    let currentReplyToText = null;
+    let currentReplyToId = null;
+    let currentReplySender = null;
+    let currentReplySnippet = null;
     
     // Context Menu State
     let currentContextMsgId = null;
     let currentContextMsgText = null;
+    let currentContextSender = null;
 
-    // Auto-resize textarea
+    // Unread count tracking
+    let unreadCount = 0;
+
+    // Copy Room Code Buttons
+    function copyRoomCode() {
+        navigator.clipboard.writeText(roomCode).then(() => {
+            if (window.showSpiderSenseToast) {
+                window.showSpiderSenseToast(`Room Code ${roomCode} copied to clipboard! 📋`, "PIN COPIED");
+            }
+            if (window.playThwipSound) window.playThwipSound();
+        });
+    }
+    document.getElementById('headerCopyCodeBtn')?.addEventListener('click', copyRoomCode);
+    document.getElementById('clickToCopyRoomCode')?.addEventListener('click', copyRoomCode);
+
+    // Scroll to bottom logic & detection
+    function isNearBottom() {
+        return chatContainer.scrollTop + chatContainer.clientHeight >= chatContainer.scrollHeight - 90;
+    }
+
+    function scrollToChatBottom() {
+        chatContainer.scrollTo({ top: chatContainer.scrollHeight, behavior: 'smooth' });
+        unreadCount = 0;
+        unreadCounterBadge.classList.add('hidden');
+        unreadCounterBadge.textContent = '0';
+        scrollToBottomBtn.classList.add('hidden');
+    }
+
+    chatContainer.addEventListener('scroll', () => {
+        if (isNearBottom()) {
+            scrollToBottomBtn.classList.add('hidden');
+            unreadCount = 0;
+            unreadCounterBadge.classList.add('hidden');
+            unreadCounterBadge.textContent = '0';
+        } else {
+            scrollToBottomBtn.classList.remove('hidden');
+        }
+    });
+
+    // Typing Heartbeat Debounce
+    let typingDebounceTimer = null;
+    function sendTypingHeartbeat() {
+        if (typingDebounceTimer) return;
+        typingDebounceTimer = setTimeout(() => {
+            typingDebounceTimer = null;
+        }, 2500);
+        
+        fetch(apiTypingUrl, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': csrfToken,
+                'X-Sender-Name': mySenderName,
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        }).catch(() => {});
+    }
+
+    // Toggle Send button vs Mic button based on input
+    function updateInputButtons() {
+        const hasText = Boolean(messageInput.value.trim().length > 0 || (fileInput.files && fileInput.files.length > 0));
+        if (hasText) {
+            sendBtn.classList.remove('hidden');
+            recordMicBtn.classList.add('hidden');
+        } else {
+            sendBtn.classList.add('hidden');
+            recordMicBtn.classList.remove('hidden');
+        }
+    }
+
     messageInput.addEventListener('input', function() {
-        this.style.height = '48px';
+        this.style.height = '46px';
         this.style.height = (this.scrollHeight) + 'px';
+        sendTypingHeartbeat();
+        updateInputButtons();
     });
     
     attachBtn.onclick = () => fileInput.click();
@@ -140,6 +487,7 @@
             filePreview.classList.remove('hidden');
             filePreview.classList.add('flex');
             messageInput.placeholder = "Add a caption...";
+            updateInputButtons();
         }
     };
     
@@ -147,14 +495,636 @@
         fileInput.value = '';
         filePreview.classList.add('hidden');
         filePreview.classList.remove('flex');
-        messageInput.placeholder = "Type a message...";
+        messageInput.placeholder = currentReplyToId ? `Reply to ${currentReplySender}...` : "Type a message...";
+        updateInputButtons();
+    };
+
+    // Reply Handler
+    window.triggerReply = function(id) {
+        const container = document.getElementById(`msg-container-${id}`);
+        if (!container) return;
+        const bubble = container.querySelector('.message-bubble');
+        if (!bubble) return;
+        
+        currentReplyToId = id;
+        currentReplySender = bubble.dataset.sender || 'Sender';
+        currentReplySnippet = bubble.dataset.rawText || (bubble.dataset.filename ? '📄 ' + bubble.dataset.filename : 'Attached File');
+        
+        const isMeSender = (currentReplySender.trim().toLowerCase() === mySenderName.trim().toLowerCase());
+        replySenderDisplay.innerText = `Replying to ${isMeSender ? 'yourself' : currentReplySender}`;
+        replyTextDisplay.innerText = currentReplySnippet;
+        
+        replyPreview.classList.remove('hidden');
+        replyPreview.classList.add('flex');
+        messageInput.placeholder = `Reply to ${isMeSender ? 'yourself' : currentReplySender}...`;
+        messageInput.focus();
+        
+        document.getElementById('contextMenu').classList.add('hidden');
     };
 
     clearReplyBtn.onclick = () => {
-        currentReplyToText = null;
+        currentReplyToId = null;
+        currentReplySender = null;
+        currentReplySnippet = null;
         replyPreview.classList.add('hidden');
         replyPreview.classList.remove('flex');
+        messageInput.placeholder = fileInput.files.length > 0 ? "Add a caption..." : "Type a message...";
     };
+
+    window.scrollToMessage = function(id) {
+        const el = document.getElementById(`msg-container-${id}`);
+        if (!el) {
+            if (window.showSpiderSenseToast) {
+                window.showSpiderSenseToast("Original message was deleted or earlier in history", "REPLY");
+            }
+            return;
+        }
+        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        const bubble = el.querySelector('.message-bubble');
+        if (bubble) {
+            bubble.classList.add('highlight-flash');
+            setTimeout(() => {
+                bubble.classList.remove('highlight-flash');
+            }, 1500);
+        }
+    };
+
+    window.quickCopy = function(id) {
+        const container = document.getElementById(`msg-container-${id}`);
+        const bubble = container ? container.querySelector('.message-bubble') : null;
+        const text = bubble ? bubble.dataset.rawText : '';
+        if (text) {
+            navigator.clipboard.writeText(text).then(() => {
+                if (window.showSpiderSenseToast) {
+                    window.showSpiderSenseToast("Message copied to clipboard! 📋", "COPIED!");
+                }
+                if (window.playThwipSound) window.playThwipSound();
+            });
+        }
+    };
+
+    // --- REACTION LOGIC & INSTANT SYNC ---
+    window.toggleReaction = async function(messageId, emoji) {
+        try {
+            const fd = new FormData();
+            fd.append('emoji', emoji);
+            fd.append('sender_name', mySenderName);
+            fd.append('avatar', myAvatar);
+            
+            const res = await fetch(`/room/${roomCode}/react/${messageId}/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': csrfToken,
+                    'X-Sender-Name': mySenderName,
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: fd
+            });
+            const data = await res.json();
+            if (data.status === 'success') {
+                messagesReactionsData[messageId] = data.reactions;
+                updateReactionsUI(messageId, data.reactions);
+                if (window.playThwipSound) window.playThwipSound();
+            }
+        } catch (e) {
+            console.error('Failed to react', e);
+        }
+    };
+
+    function updateReactionsUI(messageId, reactions) {
+        messagesReactionsData[messageId] = reactions || {};
+        const container = document.getElementById(`reactions-container-${messageId}`);
+        if (!container) return;
+        
+        container.innerHTML = '';
+        const entries = Object.entries(reactions || {});
+        if (entries.length === 0) {
+            container.classList.add('hidden');
+            return;
+        }
+        
+        container.classList.remove('hidden');
+        entries.forEach(([emoji, userItems]) => {
+            if (!userItems || userItems.length === 0) return;
+            const names = userItems.map(u => (typeof u === 'object' ? u.name : String(u)));
+            const hasMe = names.some(n => n.trim().toLowerCase() === mySenderName.trim().toLowerCase());
+            
+            const pill = document.createElement('button');
+            pill.type = 'button';
+            pill.className = `inline-flex items-center gap-1 text-[11px] px-2 py-0.5 rounded-full border transition-all cursor-pointer select-none shadow-sm ${
+                hasMe ? 'bg-red-950/80 border-red-500/80 text-white font-bold' : 'bg-gray-900/90 border-gray-700/80 text-gray-300 hover:border-gray-500'
+            }`;
+            pill.title = `Tapped by: ${names.join(', ')} — Click for info`;
+            pill.innerHTML = `<span>${emoji}</span><span>${userItems.length}</span>`;
+            pill.onclick = (e) => {
+                e.stopPropagation();
+                openReactionSheet(messageId, emoji);
+            };
+            container.appendChild(pill);
+        });
+    }
+
+    // --- WHATSAPP REACTION DETAILS BOTTOM-SHEET / MODAL ---
+    let activeSheetMsgId = null;
+    let activeSheetTab = 'all';
+
+    window.openReactionSheet = function(msgId, preferredTab = 'all') {
+        activeSheetMsgId = msgId;
+        const modal = document.getElementById('reactionSheetModal');
+        const tabsContainer = document.getElementById('reactionTabsContainer');
+        const userList = document.getElementById('reactionUserList');
+        
+        const reactions = messagesReactionsData[msgId] || {};
+        const entries = Object.entries(reactions);
+        
+        if (entries.length === 0) return;
+        
+        let totalCount = 0;
+        entries.forEach(([_, users]) => totalCount += (users ? users.length : 0));
+        
+        // Build Tabs
+        tabsContainer.innerHTML = '';
+        
+        // Tab All
+        const allTab = document.createElement('button');
+        allTab.className = `px-3 py-1 rounded-full text-xs font-bold transition-colors whitespace-nowrap cursor-pointer ${
+            preferredTab === 'all' ? 'bg-red-600 text-white shadow' : 'bg-gray-800 text-gray-400 hover:text-white'
+        }`;
+        allTab.textContent = `All ${totalCount}`;
+        allTab.onclick = () => renderReactionUsers(msgId, 'all');
+        tabsContainer.appendChild(allTab);
+        
+        // Emoji Tabs
+        entries.forEach(([em, users]) => {
+            const tabBtn = document.createElement('button');
+            tabBtn.className = `px-3 py-1 rounded-full text-xs font-bold transition-colors whitespace-nowrap flex items-center gap-1 cursor-pointer ${
+                preferredTab === em ? 'bg-red-600 text-white shadow' : 'bg-gray-800 text-gray-400 hover:text-white'
+            }`;
+            tabBtn.innerHTML = `<span>${em}</span><span>${users.length}</span>`;
+            tabBtn.onclick = () => renderReactionUsers(msgId, em);
+            tabsContainer.appendChild(tabBtn);
+        });
+        
+        activeSheetTab = preferredTab;
+        renderReactionUsers(msgId, preferredTab);
+        modal.classList.remove('hidden');
+    };
+
+    function renderReactionUsers(msgId, tab) {
+        activeSheetTab = tab;
+        const userList = document.getElementById('reactionUserList');
+        const tabsContainer = document.getElementById('reactionTabsContainer');
+        const reactions = messagesReactionsData[msgId] || {};
+        
+        // Update tab styling
+        Array.from(tabsContainer.children).forEach((btn, idx) => {
+            const isAll = (idx === 0 && tab === 'all');
+            const isEmoji = btn.textContent.includes(tab) && tab !== 'all';
+            if (isAll || isEmoji) {
+                btn.className = btn.className.replace('bg-gray-800 text-gray-400', 'bg-red-600 text-white shadow');
+            } else {
+                btn.className = btn.className.replace('bg-red-600 text-white shadow', 'bg-gray-800 text-gray-400');
+            }
+        });
+        
+        userList.innerHTML = '';
+        
+        let usersToRender = [];
+        if (tab === 'all') {
+            Object.entries(reactions).forEach(([emoji, list]) => {
+                (list || []).forEach(u => {
+                    usersToRender.push({
+                        name: typeof u === 'object' ? u.name : String(u),
+                        avatar: typeof u === 'object' ? (u.avatar || 'classic') : 'classic',
+                        emoji: emoji
+                    });
+                });
+            });
+        } else {
+            const list = reactions[tab] || [];
+            list.forEach(u => {
+                usersToRender.push({
+                    name: typeof u === 'object' ? u.name : String(u),
+                    avatar: typeof u === 'object' ? (u.avatar || 'classic') : 'classic',
+                    emoji: tab
+                });
+            });
+        }
+        
+        usersToRender.forEach(item => {
+            const isMe = item.name.trim().toLowerCase() === mySenderName.trim().toLowerCase();
+            const avatarMeta = AVATARS[item.avatar] || AVATARS['classic'];
+            
+            const row = document.createElement('div');
+            row.className = "flex items-center justify-between p-2.5 rounded-xl bg-gray-900/70 hover:bg-gray-800/80 transition-colors";
+            row.innerHTML = `
+                <div class="flex items-center gap-3">
+                    <div class="w-9 h-9 rounded-full flex items-center justify-center text-base border border-gray-700 bg-black/40" style="border-color: ${avatarMeta.color}60;">
+                        ${avatarMeta.emoji}
+                    </div>
+                    <div class="flex flex-col">
+                        <span class="text-xs font-bold text-white flex items-center gap-1.5">
+                            ${item.name}
+                            ${isMe ? '<span class="text-[10px] text-red-400 font-normal bg-red-950/60 px-1.5 py-0.2 rounded border border-red-500/40">You</span>' : ''}
+                        </span>
+                        ${isMe ? `<button onclick="toggleReaction(${msgId}, '${item.emoji}'); closeReactionSheet();" class="text-[10px] text-gray-400 hover:text-red-400 text-left transition-colors cursor-pointer">Tap to remove</button>` : `<span class="text-[10px] text-gray-400">${avatarMeta.name}</span>`}
+                    </div>
+                </div>
+                <span class="text-lg">${item.emoji}</span>
+            `;
+            userList.appendChild(row);
+        });
+    }
+
+    window.closeReactionSheet = function() {
+        document.getElementById('reactionSheetModal')?.classList.add('hidden');
+    };
+    document.getElementById('reactionSheetModal')?.addEventListener('click', (e) => {
+        if (e.target.id === 'reactionSheetModal') closeReactionSheet();
+    });
+
+    // --- WHATSAPP VOICE NOTES RECORDING (MediaRecorder) ---
+    let mediaRecorder = null;
+    let audioChunks = [];
+    let recordStartTime = 0;
+    let recordInterval = null;
+
+    window.startVoiceRecording = async function() {
+        try {
+            if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                alert("Audio recording is not supported in this browser.");
+                return;
+            }
+            
+            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            audioChunks = [];
+            mediaRecorder = new MediaRecorder(stream);
+            
+            mediaRecorder.ondataavailable = (e) => {
+                if (e.data && e.data.size > 0) audioChunks.push(e.data);
+            };
+            
+            mediaRecorder.start(100);
+            recordStartTime = Date.now();
+            
+            document.getElementById('normalInputBar').classList.add('hidden');
+            document.getElementById('voiceRecordingBar').classList.remove('hidden');
+            
+            recordInterval = setInterval(() => {
+                const elapsed = Math.floor((Date.now() - recordStartTime) / 1000);
+                const m = Math.floor(elapsed / 60);
+                const s = elapsed % 60;
+                document.getElementById('recordingTimer').textContent = `${m}:${String(s).padStart(2, '0')}`;
+            }, 500);
+            
+            if (window.playThwipSound) window.playThwipSound();
+        } catch (err) {
+            alert("Microphone permission denied or not available.");
+        }
+    };
+
+    window.cancelVoiceRecording = function() {
+        if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+            mediaRecorder.stream.getTracks().forEach(t => t.stop());
+            mediaRecorder.stop();
+        }
+        clearInterval(recordInterval);
+        audioChunks = [];
+        document.getElementById('recordingTimer').textContent = '0:00';
+        document.getElementById('voiceRecordingBar').classList.add('hidden');
+        document.getElementById('normalInputBar').classList.remove('hidden');
+    };
+
+    window.stopAndSendVoiceRecording = function() {
+        if (!mediaRecorder) return;
+        
+        mediaRecorder.stream.getTracks().forEach(t => t.stop());
+        mediaRecorder.onstop = async () => {
+            clearInterval(recordInterval);
+            document.getElementById('voiceRecordingBar').classList.add('hidden');
+            document.getElementById('normalInputBar').classList.remove('hidden');
+            
+            const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+            if (audioBlob.size < 100) return;
+            
+            const fd = new FormData();
+            const filename = `voice_note_${Date.now()}.webm`;
+            fd.append('file', audioBlob, filename);
+            fd.append('is_voice_note', '1');
+            fd.append('sender_name', mySenderName);
+            fd.append('avatar', myAvatar);
+            if (currentReplyToId) fd.append('reply_to_id', currentReplyToId);
+            
+            try {
+                const res = await fetch(apiSendUrl, {
+                    method: 'POST',
+                    body: fd,
+                    headers: {
+                        'X-CSRFToken': csrfToken,
+                        'X-Sender-Name': mySenderName,
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                });
+                const data = await res.json();
+                if (data.status === 'success') {
+                    clearReplyBtn.click();
+                    fetchMessages();
+                    if (window.playThwipSound) window.playThwipSound();
+                }
+            } catch (e) {
+                alert("Failed to send voice note.");
+            }
+        };
+        
+        mediaRecorder.stop();
+    };
+
+    // --- WHATSAPP VOICE NOTE AUDIO PLAYER ---
+    let activeAudio = null;
+    let activeAudioId = null;
+
+    window.toggleAudioPlay = function(id, url) {
+        const btn = document.getElementById(`audio-btn-${id}`);
+        const slider = document.getElementById(`audio-progress-${id}`);
+        const timeDisplay = document.getElementById(`audio-time-${id}`);
+        
+        if (activeAudioId === id && activeAudio) {
+            if (!activeAudio.paused) {
+                activeAudio.pause();
+                btn.textContent = '▶';
+                return;
+            } else {
+                activeAudio.play();
+                btn.textContent = '⏸';
+                return;
+            }
+        }
+        
+        // Stop any previous audio
+        if (activeAudio) {
+            activeAudio.pause();
+            const prevBtn = document.getElementById(`audio-btn-${activeAudioId}`);
+            if (prevBtn) prevBtn.textContent = '▶';
+        }
+        
+        activeAudioId = id;
+        activeAudio = new Audio(url);
+        
+        activeAudio.addEventListener('timeupdate', () => {
+            if (!activeAudio || !activeAudio.duration) return;
+            const pct = (activeAudio.currentTime / activeAudio.duration) * 100;
+            slider.value = pct;
+            
+            const cur = Math.floor(activeAudio.currentTime);
+            const dur = Math.floor(activeAudio.duration) || 0;
+            const curStr = `${Math.floor(cur / 60)}:${String(cur % 60).padStart(2, '0')}`;
+            const durStr = `${Math.floor(dur / 60)}:${String(dur % 60).padStart(2, '0')}`;
+            timeDisplay.textContent = `${curStr} / ${durStr}`;
+        });
+        
+        activeAudio.addEventListener('ended', () => {
+            btn.textContent = '▶';
+            slider.value = 0;
+        });
+        
+        activeAudio.play();
+        btn.textContent = '⏸';
+    };
+
+    window.seekAudio = function(id, pct) {
+        if (activeAudioId === id && activeAudio && activeAudio.duration) {
+            activeAudio.currentTime = (pct / 100) * activeAudio.duration;
+        }
+    };
+
+    window.cycleAudioSpeed = function(id) {
+        const speedBtn = document.getElementById(`audio-speed-${id}`);
+        if (!activeAudio || activeAudioId !== id) return;
+        
+        let nextSpeed = 1.0;
+        if (activeAudio.playbackRate === 1.0) nextSpeed = 1.5;
+        else if (activeAudio.playbackRate === 1.5) nextSpeed = 2.0;
+        else nextSpeed = 1.0;
+        
+        activeAudio.playbackRate = nextSpeed;
+        speedBtn.textContent = `${nextSpeed}x`;
+    };
+
+    // --- DELETE FOR EVERYONE vs DELETE FOR ME ---
+    window.confirmDeleteForEveryone = async function() {
+        if (!currentContextMsgId) return;
+        try {
+            const fd = new FormData();
+            fd.append('sender_name', mySenderName);
+            
+            const res = await fetch(`/room/${roomCode}/delete/${currentContextMsgId}/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': csrfToken,
+                    'X-Sender-Name': mySenderName,
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: fd
+            });
+            const data = await res.json();
+            if (data.status === 'success') {
+                markMessageAsDeletedInUI(currentContextMsgId, 'This message was deleted');
+                closeDeleteModal();
+                if (window.showSpiderSenseToast) {
+                    window.showSpiderSenseToast("Message deleted for everyone 🗑️", "DELETED");
+                }
+                if (window.playThwipSound) window.playThwipSound();
+            } else {
+                alert(data.message || "Failed to delete");
+            }
+        } catch (e) {
+            alert("Delete request failed");
+        }
+    };
+
+    window.confirmDeleteForMe = function() {
+        if (!currentContextMsgId) return;
+        saveDeletedId(currentContextMsgId);
+        const el = document.getElementById(`msg-container-${currentContextMsgId}`);
+        if (el) {
+            el.style.transform = 'scale(0.85) translateY(6px)';
+            el.style.opacity = '0';
+            setTimeout(() => el.remove(), 220);
+        }
+        closeDeleteModal();
+        if (window.showSpiderSenseToast) {
+            window.showSpiderSenseToast("Message deleted from your view 🗑️", "DELETED");
+        }
+        if (window.playThwipSound) window.playThwipSound();
+    };
+
+    window.closeDeleteModal = function() {
+        document.getElementById('deleteModal')?.classList.add('hidden');
+    };
+    document.getElementById('deleteModal')?.addEventListener('click', (e) => {
+        if (e.target.id === 'deleteModal') closeDeleteModal();
+    });
+
+    function markMessageAsDeletedInUI(id, textContent) {
+        const container = document.getElementById(`msg-container-${id}`);
+        if (!container) return;
+        const bubble = container.querySelector('.message-bubble');
+        if (!bubble) return;
+        
+        bubble.innerHTML = `
+            <div class="italic text-xs text-gray-400 flex items-center gap-1.5 py-1 select-none">
+                <svg class="w-3.5 h-3.5 text-gray-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"></path></svg>
+                <span>${textContent || 'This message was deleted'}</span>
+            </div>
+        `;
+        bubble.className = "message-bubble bg-gray-900/90 text-gray-400 rounded-2xl p-2.5 border border-gray-800/80 max-w-xs";
+        
+        // Remove toolbar & reactions
+        const toolbar = container.querySelector('.group-hover\\/msg\\:flex');
+        if (toolbar) toolbar.remove();
+        const reactionsBox = document.getElementById(`reactions-container-${id}`);
+        if (reactionsBox) reactionsBox.remove();
+    }
+
+    // --- STARRED MESSAGES ---
+    window.openStarredModal = function() {
+        const modal = document.getElementById('starredModal');
+        const list = document.getElementById('starredList');
+        const starredIds = getStarredIds();
+        
+        list.innerHTML = '';
+        if (starredIds.size === 0) {
+            list.innerHTML = '<p class="text-xs text-gray-500 text-center py-6">No starred messages yet. Star any important message from its menu!</p>';
+        } else {
+            starredIds.forEach(id => {
+                const el = document.getElementById(`msg-container-${id}`);
+                const bubble = el ? el.querySelector('.message-bubble') : null;
+                if (!bubble) return;
+                
+                const sender = bubble.dataset.sender || 'Sender';
+                const text = bubble.dataset.rawText || (bubble.dataset.filename ? '📄 ' + bubble.dataset.filename : 'Media message');
+                
+                const card = document.createElement('div');
+                card.className = "p-3 rounded-xl bg-gray-900 border border-gray-800 hover:border-yellow-500/50 transition-all cursor-pointer";
+                card.onclick = () => {
+                    scrollToMessage(id);
+                    closeStarredModal();
+                };
+                card.innerHTML = `
+                    <div class="flex items-center justify-between mb-1">
+                        <span class="text-xs font-bold text-yellow-400 flex items-center gap-1">⭐ ${sender}</span>
+                        <span class="text-[10px] text-gray-500">Jump to &rarr;</span>
+                    </div>
+                    <p class="text-xs text-gray-200 line-clamp-2 italic">${text}</p>
+                `;
+                list.appendChild(card);
+            });
+        }
+        
+        modal.classList.remove('hidden');
+    };
+
+    window.closeStarredModal = function() {
+        document.getElementById('starredModal')?.classList.add('hidden');
+    };
+    document.getElementById('starredModal')?.addEventListener('click', (e) => {
+        if (e.target.id === 'starredModal') closeStarredModal();
+    });
+
+    // --- IN-CHAT MESSAGE SEARCH ---
+    let searchHits = [];
+    let searchHitIndex = -1;
+
+    window.toggleSearchBar = function() {
+        const bar = document.getElementById('searchBarContainer');
+        const input = document.getElementById('chatSearchInput');
+        if (bar.classList.contains('hidden')) {
+            bar.classList.remove('hidden');
+            input.focus();
+            handleSearchInput();
+        } else {
+            closeSearchBar();
+        }
+    };
+
+    window.closeSearchBar = function() {
+        document.getElementById('searchBarContainer')?.classList.add('hidden');
+        document.getElementById('chatSearchInput').value = '';
+        clearSearchHighlights();
+    };
+
+    function clearSearchHighlights() {
+        document.querySelectorAll('.search-highlight').forEach(el => {
+            el.outerHTML = el.innerHTML;
+        });
+        searchHits = [];
+        searchHitIndex = -1;
+        document.getElementById('searchMatchCount').textContent = '0/0';
+    }
+
+    window.handleSearchInput = function() {
+        const query = document.getElementById('chatSearchInput').value.trim().toLowerCase();
+        clearSearchHighlights();
+        
+        if (!query || query.length < 2) return;
+        
+        const bubbles = document.querySelectorAll('.message-bubble');
+        searchHits = [];
+        
+        bubbles.forEach(bubble => {
+            const raw = bubble.dataset.rawText || '';
+            if (raw.toLowerCase().includes(query)) {
+                searchHits.push(bubble);
+            }
+        });
+        
+        const counter = document.getElementById('searchMatchCount');
+        if (searchHits.length > 0) {
+            searchHitIndex = 0;
+            counter.textContent = `1/${searchHits.length}`;
+            jumpToSearchHit(0);
+        } else {
+            counter.textContent = '0/0';
+        }
+    };
+
+    window.navigateSearch = function(dir) {
+        if (searchHits.length === 0) return;
+        searchHitIndex = (searchHitIndex + dir + searchHits.length) % searchHits.length;
+        document.getElementById('searchMatchCount').textContent = `${searchHitIndex + 1}/${searchHits.length}`;
+        jumpToSearchHit(searchHitIndex);
+    };
+
+    function jumpToSearchHit(idx) {
+        const target = searchHits[idx];
+        if (!target) return;
+        target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        target.classList.add('highlight-flash');
+        setTimeout(() => target.classList.remove('highlight-flash'), 1200);
+    }
+
+    // --- LIGHTBOX MODAL ---
+    window.openLightbox = function(url, caption) {
+        const modal = document.getElementById('lightboxModal');
+        const img = document.getElementById('lightboxImg');
+        const cap = document.getElementById('lightboxCaption');
+        const dlBtn = document.getElementById('lightboxDownloadBtn');
+        
+        img.src = url;
+        cap.textContent = caption || '';
+        dlBtn.href = url;
+        dlBtn.download = caption || 'spiddy_media';
+        
+        modal.classList.remove('hidden');
+    };
+
+    window.closeLightbox = function() {
+        document.getElementById('lightboxModal').classList.add('hidden');
+    };
+
+    document.getElementById('lightboxModal')?.addEventListener('click', (e) => {
+        if (e.target.id === 'lightboxModal') closeLightbox();
+    });
     
     async function sendMessage() {
         let text = messageInput.value.trim();
@@ -165,32 +1135,33 @@
         sendBtn.disabled = true;
         sendBtn.style.opacity = '0.5';
         
-        // Append quoted reply if active
-        if (currentReplyToText) {
-            // Trim quoted text to 60 chars
-            let quoted = currentReplyToText.length > 60 ? currentContextMsgText.substring(0, 60) + '...' : currentContextMsgText;
-            text = `> ${quoted}\n\n${text}`;
-            clearReplyBtn.click();
-        }
-        
         const fd = new FormData();
         if (text) fd.append('text_content', text);
         if (file) fd.append('file', file);
+        if (currentReplyToId) fd.append('reply_to_id', currentReplyToId);
+        fd.append('sender_name', mySenderName);
+        fd.append('avatar', myAvatar);
         
         try {
             const response = await fetch(apiSendUrl, {
                 method: 'POST',
                 body: fd,
-                headers: {'X-CSRFToken': csrfToken, 'X-Requested-With': 'XMLHttpRequest'}
+                headers: {
+                    'X-CSRFToken': csrfToken, 
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'X-Sender-Name': mySenderName
+                }
             });
             const data = await response.json();
             if (data.status === 'success') {
                 messageInput.value = '';
-                messageInput.style.height = '48px';
+                messageInput.style.height = '46px';
                 clearFileBtn.click();
-                fetchMessages(); // Immediately fetch the sent message
+                clearReplyBtn.click();
+                updateInputButtons();
+                fetchMessages();
             } else {
-                alert(data.message);
+                alert(data.message || "Failed to send");
             }
         } catch (err) {
             alert("Failed to send message.");
@@ -215,14 +1186,13 @@
         const fade = document.getElementById(`fade-${id}`);
         
         if (textDiv.style.maxHeight === '120px') {
-            textDiv.style.maxHeight = '2000px'; // expand
-            if(fade) fade.style.display = 'none';
+            textDiv.style.maxHeight = '2000px';
+            if (fade) fade.style.display = 'none';
             btn.innerText = 'See Less';
         } else {
-            textDiv.style.maxHeight = '120px'; // collapse
-            if(fade) fade.style.display = 'block';
+            textDiv.style.maxHeight = '120px';
+            if (fade) fade.style.display = 'block';
             btn.innerText = 'See More';
-            // Scroll adjustment
             textDiv.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
         }
     };
@@ -230,14 +1200,16 @@
     function showContextMenu(msgBubble, x, y) {
         currentContextMsgId = msgBubble.dataset.id;
         currentContextMsgText = msgBubble.dataset.rawText;
+        currentContextSender = msgBubble.dataset.sender;
+        
+        const isStarred = getStarredIds().has(Number(currentContextMsgId));
+        document.getElementById('menuStarText').textContent = isStarred ? "Unstar message" : "Star message";
         
         const menu = document.getElementById('contextMenu');
         menu.classList.remove('hidden');
         
-        // Positioning logic (responsive for mobile)
-        if (x + 200 > window.innerWidth) x -= 200;
-        if (y + 150 > window.innerHeight) y -= 150;
-        
+        if (x + 210 > window.innerWidth) x = window.innerWidth - 220;
+        if (y + 170 > window.innerHeight) y = window.innerHeight - 180;
         if (x < 10) x = 10;
         if (y < 10) y = 10;
         
@@ -245,7 +1217,17 @@
         menu.style.top = `${y}px`;
     }
 
-    // Right Click Context Menu Logic
+    window.openMenuFor = function(id, e) {
+        e.stopPropagation();
+        const container = document.getElementById(`msg-container-${id}`);
+        const bubble = container ? container.querySelector('.message-bubble') : null;
+        if (bubble) {
+            const rect = bubble.getBoundingClientRect();
+            showContextMenu(bubble, rect.right - 100, rect.bottom + 5);
+        }
+    };
+
+    // Right Click Context Menu
     document.addEventListener('contextmenu', (e) => {
         const msgBubble = e.target.closest('.message-bubble');
         if (msgBubble) {
@@ -268,11 +1250,10 @@
             touchY = e.touches[0].clientY;
             touchTimer = setTimeout(() => {
                 showContextMenu(msgBubble, touchX, touchY);
-                // Vibrate if supported on mobile
-                if (navigator.vibrate) navigator.vibrate(50);
+                if (navigator.vibrate) navigator.vibrate(40);
             }, 500);
         }
-    }, {passive: false});
+    }, {passive: true});
 
     document.addEventListener('touchend', () => {
         if (touchTimer) clearTimeout(touchTimer);
@@ -286,7 +1267,7 @@
                 clearTimeout(touchTimer);
             }
         }
-    }, {passive: false});
+    }, {passive: true});
 
     document.addEventListener('click', (e) => {
         if (!e.target.closest('#contextMenu')) {
@@ -295,124 +1276,315 @@
     });
 
     window.handleMenuAction = function(action) {
+        const menu = document.getElementById('contextMenu');
+        menu.classList.add('hidden');
         if (!currentContextMsgId) return;
         
         if (action === 'copy') {
-            navigator.clipboard.writeText(currentContextMsgText).then(() => {
-                // Optional: show mini toast
+            navigator.clipboard.writeText(currentContextMsgText || '').then(() => {
+                if (window.showSpiderSenseToast) {
+                    window.showSpiderSenseToast("Message copied to clipboard! 📋", "COPIED!");
+                }
+                if (window.playThwipSound) window.playThwipSound();
             });
         } else if (action === 'reply') {
-            currentReplyToText = currentContextMsgText;
-            replyTextDisplay.innerText = currentContextMsgText;
-            replyPreview.classList.remove('hidden');
-            replyPreview.classList.add('flex');
-            messageInput.focus();
+            triggerReply(currentContextMsgId);
+        } else if (action === 'star') {
+            toggleStarred(currentContextMsgId);
         } else if (action === 'delete') {
-            const el = document.getElementById(`msg-container-${currentContextMsgId}`);
-            if (el) {
-                el.style.opacity = '0';
-                setTimeout(() => el.remove(), 300);
+            const isMe = currentContextSender && currentContextSender.trim().toLowerCase() === mySenderName.trim().toLowerCase();
+            if (isMe) {
+                document.getElementById('deleteModal').classList.remove('hidden');
+            } else {
+                confirmDeleteForMe();
             }
         }
     };
     
+    function isImageFilename(filename) {
+        if (!filename) return false;
+        const ext = filename.split('.').pop().toLowerCase();
+        return ['png', 'jpg', 'jpeg', 'gif', 'webp', 'svg'].includes(ext);
+    }
+
     function appendMessage(msg) {
+        // Skip if already in list or deleted by user
+        if (document.getElementById(`msg-container-${msg.id}`)) {
+            // Update reactions if changed
+            updateReactionsUI(msg.id, msg.reactions);
+            if (msg.is_deleted) {
+                markMessageAsDeletedInUI(msg.id, msg.text_content);
+            }
+            return;
+        }
+        if (getDeletedIds().has(Number(msg.id))) return;
+        
         const div = document.createElement('div');
         div.id = `msg-container-${msg.id}`;
-        div.className = "transition-all duration-300";
         
+        // System message (centered pill)
         if (msg.is_system) {
-            div.className += " text-center my-2";
-            div.innerHTML = `<span class="bg-gray-800/80 backdrop-blur-sm text-gray-400 text-xs px-4 py-1.5 rounded-full border border-gray-700/50 shadow-sm">${msg.text_content}</span>`;
+            div.className = "w-full flex justify-center my-1.5 transition-all duration-300";
+            div.innerHTML = `<span class="bg-gray-800/80 backdrop-blur-sm text-gray-400 text-[11px] px-3.5 py-1 rounded-full border border-gray-700/50 shadow-sm">${msg.text_content}</span>`;
             messagesList.appendChild(div);
             return;
         }
         
-        div.className += ` flex flex-col w-full max-w-[85%] min-w-0 ${msg.is_me ? 'self-end items-end' : 'self-start items-start'}`;
+        // Determine whether this message is from "me" (WhatsApp: Right side) or someone else (WhatsApp: Left side)
+        const isMe = Boolean(msg.is_me || (msg.sender_name && msg.sender_name.trim().toLowerCase() === mySenderName.trim().toLowerCase()));
+        const isStarred = getStarredIds().has(Number(msg.id));
+        
+        div.className = `w-full flex ${isMe ? 'justify-end' : 'justify-start'} my-1 group/msg relative transition-all duration-300`;
         
         let contentHtml = '';
-        if (msg.file_url) {
-            contentHtml += `
-                <div class="bg-black/40 border border-gray-700/50 rounded-xl p-3 mb-2 flex items-center gap-4 hover:bg-black/50 transition-colors w-full">
-                    <div class="w-10 h-10 rounded-lg bg-red-600/20 flex items-center justify-center text-xl border border-red-500/30 shrink-0">📄</div>
-                    <div class="flex flex-col overflow-hidden min-w-0 flex-1">
-                        <span class="text-sm font-bold text-white truncate w-full">${msg.original_filename}</span>
-                        <a href="${msg.file_url}" download="${msg.original_filename}" target="_blank" class="text-red-400 hover:text-red-300 text-[10px] font-bold uppercase mt-1 tracking-widest flex items-center gap-1">
-                            Download <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
-                        </a>
-                    </div>
+        
+        // Deleted Message Handling
+        if (msg.is_deleted) {
+            contentHtml = `
+                <div class="italic text-xs text-gray-400 flex items-center gap-1.5 py-1 select-none">
+                    <svg class="w-3.5 h-3.5 text-gray-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"></path></svg>
+                    <span>${msg.text_content || 'This message was deleted'}</span>
                 </div>
             `;
-        }
-        
-        // Handle long text and quoted replies
-        if (msg.text_content) {
-            let safeText = msg.text_content.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+        } else {
+            // Quoted Reply Card (WhatsApp style)
+            let replyObj = msg.reply_to;
+            let actualText = msg.text_content || '';
             
-            // Format Quotes
-            if (safeText.startsWith('&gt; ')) {
-                const parts = safeText.split('\n\n');
-                if (parts.length >= 2) {
-                    const quote = parts[0].replace('&gt; ', '');
-                    const rest = parts.slice(1).join('\n\n');
-                    safeText = `
-                        <div class="bg-black/20 border-l-4 border-${msg.is_me ? 'red-300' : 'gray-400'} p-2 rounded text-xs mb-2 text-gray-300 italic opacity-80 min-w-0 break-words">
-                            ${quote}
+            // Backwards compatibility: parse legacy `> quote\n\nrest`
+            if (!replyObj && actualText.startsWith('> ')) {
+                const splitIndex = actualText.lastIndexOf('\n\n');
+                if (splitIndex > 0) {
+                    const quoteText = actualText.substring(0, splitIndex).replace(/^>\s*/, '').trim();
+                    actualText = actualText.substring(splitIndex + 2).trim();
+                    replyObj = {
+                        id: null,
+                        sender_name: 'Quoted Message',
+                        text: quoteText,
+                        is_me: false
+                    };
+                }
+            }
+            
+            if (replyObj) {
+                const replySenderName = replyObj.is_me ? 'You' : (replyObj.sender_name || 'Sender');
+                const quoteText = replyObj.text || (replyObj.filename ? `📄 ${replyObj.filename}` : 'Attachment');
+                const clickHandler = replyObj.id ? `onclick="scrollToMessage(${replyObj.id})"` : '';
+                
+                contentHtml += `
+                    <div ${clickHandler} class="mb-1.5 p-2 rounded-lg bg-black/35 hover:bg-black/45 border-l-4 ${isMe ? 'border-l-red-300' : 'border-l-sky-400'} cursor-pointer transition-all">
+                        <div class="flex items-center justify-between text-[11px] font-bold mb-0.5 ${isMe ? 'text-red-200' : 'text-sky-300'}">
+                            <span>${replySenderName}</span>
+                            <span class="text-[9px] opacity-70 font-normal uppercase tracking-wider">Quote</span>
                         </div>
-                        ${rest}
+                        <div class="text-xs text-gray-200 truncate italic">
+                            ${quoteText}
+                        </div>
+                    </div>
+                `;
+            }
+            
+            // WhatsApp Voice Note or File/Image
+            if (msg.is_voice_note || (msg.original_filename && msg.original_filename.startsWith('voice_note_'))) {
+                const avatarInfo = AVATARS[msg.avatar] || AVATARS['classic'];
+                contentHtml += `
+                    <div class="flex items-center gap-3 p-2 bg-black/30 rounded-xl min-w-[210px] sm:min-w-[240px] border border-white/10 mb-1.5">
+                        <div class="relative shrink-0">
+                            <div class="w-9 h-9 rounded-full flex items-center justify-center text-base border border-red-500/40 bg-red-600/30">
+                                ${avatarInfo.emoji}
+                            </div>
+                            <span class="absolute -bottom-1 -right-1 text-xs bg-gray-900 rounded-full p-0.5">🎙️</span>
+                        </div>
+                        <button onclick="toggleAudioPlay('${msg.id}', '${msg.file_url}')" id="audio-btn-${msg.id}" 
+                            class="w-8 h-8 rounded-full ${isMe ? 'bg-white text-red-600' : 'bg-red-600 text-white'} flex items-center justify-center text-xs shadow hover:scale-105 active:scale-95 transition-transform shrink-0">
+                            ▶
+                        </button>
+                        <div class="flex flex-col flex-1 min-w-0">
+                            <input type="range" min="0" max="100" value="0" id="audio-progress-${msg.id}" 
+                                oninput="seekAudio('${msg.id}', this.value)" 
+                                class="w-full h-1.5 bg-gray-700 rounded-lg appearance-none cursor-pointer accent-red-500">
+                            <div class="flex items-center justify-between text-[10px] text-gray-300 mt-1 font-mono">
+                                <span id="audio-time-${msg.id}">0:00</span>
+                                <button onclick="cycleAudioSpeed('${msg.id}')" id="audio-speed-${msg.id}" class="text-[9px] bg-black/40 hover:bg-black/60 px-1 py-0.2 rounded text-gray-300 font-bold uppercase tracking-wider">1x</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            } else if (msg.file_url) {
+                const isImg = isImageFilename(msg.original_filename);
+                const escapedFn = msg.original_filename ? msg.original_filename.replace(/"/g, '&quot;') : 'Image';
+                
+                if (isImg) {
+                    contentHtml += `
+                        <div class="rounded-xl overflow-hidden mb-1.5 cursor-pointer relative group/img max-h-56 bg-black/40 border border-white/10" onclick="openLightbox('${msg.file_url}', '${escapedFn}')">
+                            <img src="${msg.file_url}" alt="${escapedFn}" class="w-full h-auto max-h-56 object-cover hover:scale-105 transition-transform duration-300" loading="lazy">
+                            <div class="absolute inset-0 bg-black/40 opacity-0 group-hover/img:opacity-100 transition-opacity flex items-center justify-center gap-2">
+                                <span class="bg-black/80 text-white text-xs px-3 py-1 rounded-full font-bold flex items-center gap-1.5 shadow-lg">🔍 Fullscreen</span>
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    contentHtml += `
+                        <div class="bg-black/30 border border-white/10 rounded-xl p-2.5 mb-1.5 flex items-center gap-3 hover:bg-black/40 transition-colors w-full">
+                            <div class="w-9 h-9 rounded-lg bg-red-600/30 flex items-center justify-center text-lg border border-red-500/40 shrink-0">📄</div>
+                            <div class="flex flex-col overflow-hidden min-w-0 flex-1">
+                                <span class="text-xs font-bold text-white truncate">${msg.original_filename || 'File'}</span>
+                                <a href="${msg.file_url}" download="${msg.original_filename || ''}" target="_blank" class="text-red-300 hover:text-white text-[10px] font-bold uppercase mt-0.5 tracking-wider flex items-center gap-1">
+                                    Download <svg class="w-2.5 h-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                                </a>
+                            </div>
+                        </div>
                     `;
                 }
             }
             
-            const rawLength = msg.text_content.length;
-            const lineCount = (msg.text_content.match(/\n/g) || []).length;
-            const isLong = rawLength > 400 || lineCount > 6;
-            
-            const htmlText = safeText.replace(/\n/g, '<br>');
-            
-            if (isLong) {
-                contentHtml += `
-                    <div id="msg-text-${msg.id}" class="text-sm leading-relaxed text-gray-100 overflow-hidden transition-all duration-300 relative break-words whitespace-pre-wrap min-w-0" style="max-height: 120px;">
-                        ${htmlText}
-                        <div id="fade-${msg.id}" class="absolute bottom-0 left-0 right-0 h-10 bg-gradient-to-t ${msg.is_me ? 'from-[#dc2626]' : 'from-[#1f2937]'} to-transparent"></div>
-                    </div>
-                    <button id="btn-${msg.id}" onclick="toggleReadMore(${msg.id})" class="text-[10px] font-bold mt-2 tracking-widest uppercase text-white/70 hover:text-white transition-colors">See More</button>
-                `;
-            } else {
-                contentHtml += `<p class="text-sm leading-relaxed text-gray-100 break-words whitespace-pre-wrap min-w-0">${htmlText}</p>`;
+            // Message text
+            if (actualText) {
+                let safeText = actualText.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+                const rawLength = actualText.length;
+                const lineCount = (actualText.match(/\n/g) || []).length;
+                const isLong = rawLength > 400 || lineCount > 6;
+                const htmlText = safeText.replace(/\n/g, '<br>');
+                
+                if (isLong) {
+                    contentHtml += `
+                        <div id="msg-text-${msg.id}" class="text-sm leading-relaxed text-gray-100 overflow-hidden transition-all duration-300 relative break-words min-w-0" style="max-height: 120px;">
+                            ${htmlText}
+                            <div id="fade-${msg.id}" class="absolute bottom-0 left-0 right-0 h-8 bg-gradient-to-t ${isMe ? 'from-red-800' : 'from-gray-800'} to-transparent"></div>
+                        </div>
+                        <button id="btn-${msg.id}" onclick="toggleReadMore(${msg.id})" class="text-[10px] font-bold mt-1.5 tracking-widest uppercase text-white/80 hover:text-white transition-colors">See More</button>
+                    `;
+                } else {
+                    contentHtml += `<p class="text-sm leading-relaxed text-gray-100 break-words min-w-0">${htmlText}</p>`;
+                }
             }
         }
         
-        // Escape for data attribute
         const escapedRaw = msg.text_content ? msg.text_content.replace(/"/g, '&quot;') : '';
-
+        const escapedFilename = msg.original_filename ? msg.original_filename.replace(/"/g, '&quot;') : '';
+        
+        const bubbleStyle = isMe 
+            ? 'bg-gradient-to-br from-red-600 to-red-700 text-white rounded-2xl rounded-tr-xs shadow-md border border-red-500/30 ml-auto'
+            : 'bg-[#1f2937] text-gray-100 rounded-2xl rounded-tl-xs shadow-md border border-gray-700/80 mr-auto';
+            
+        const avatarInfo = AVATARS[msg.avatar] || AVATARS['classic'];
+        
         div.innerHTML = `
-            <span class="text-[10px] text-gray-500 mb-1 px-2 font-medium tracking-wide uppercase">${msg.is_me ? 'You' : msg.sender_name} • ${msg.created_at}</span>
-            <div class="message-bubble ${msg.is_me ? 'bg-red-600 border border-red-500 rounded-l-2xl rounded-tr-2xl' : 'bg-gray-800 border border-gray-700 rounded-r-2xl rounded-tl-2xl'} p-3.5 shadow-lg relative group cursor-context-menu hover:brightness-110 transition-all break-words min-w-0 overflow-hidden w-full" data-id="${msg.id}" data-raw-text="${escapedRaw}">
-                ${contentHtml}
+            <!-- Message Bubble Wrapper -->
+            <div class="relative max-w-[86%] sm:max-w-[74%] min-w-[125px] flex flex-col ${isMe ? 'items-end' : 'items-start'}">
+                
+                ${!msg.is_deleted ? `
+                <!-- Quick WhatsApp Reaction & Action Toolbar (Appears on Hover) -->
+                <div class="absolute ${isMe ? 'right-1' : 'left-1'} -top-8 hidden group-hover/msg:flex items-center gap-1 bg-gray-950/95 border border-gray-700 rounded-full px-2 py-1 shadow-2xl z-30 backdrop-blur-md">
+                    <!-- Quick Emojis -->
+                    <button onclick="toggleReaction(${msg.id}, '🕸️')" title="Web" class="hover:scale-125 transition-transform text-xs p-0.5">🕸️</button>
+                    <button onclick="toggleReaction(${msg.id}, '❤️')" title="Love" class="hover:scale-125 transition-transform text-xs p-0.5">❤️</button>
+                    <button onclick="toggleReaction(${msg.id}, '🔥')" title="Fire" class="hover:scale-125 transition-transform text-xs p-0.5">🔥</button>
+                    <button onclick="toggleReaction(${msg.id}, '😂')" title="Laugh" class="hover:scale-125 transition-transform text-xs p-0.5">😂</button>
+                    <button onclick="toggleReaction(${msg.id}, '⚡')" title="Tingle" class="hover:scale-125 transition-transform text-xs p-0.5">⚡</button>
+                    <div class="w-px h-3 bg-gray-700 mx-0.5"></div>
+                    <button onclick="triggerReply(${msg.id})" title="Reply" class="p-1 hover:text-red-400 text-gray-400 hover:bg-gray-800 rounded-full transition-colors">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"></path></svg>
+                    </button>
+                    <button onclick="quickCopy(${msg.id})" title="Copy" class="p-1 hover:text-blue-400 text-gray-400 hover:bg-gray-800 rounded-full transition-colors">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
+                    </button>
+                    <button onclick="openMenuFor(${msg.id}, event)" title="More options" class="p-1 hover:text-white text-gray-400 hover:bg-gray-800 rounded-full transition-colors">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01"></path></svg>
+                    </button>
+                </div>
+                ` : ''}
+
+                <div class="message-bubble ${bubbleStyle} p-3 transition-all cursor-context-menu w-full"
+                    data-id="${msg.id}" 
+                    data-raw-text="${escapedRaw}" 
+                    data-sender="${msg.sender_name}" 
+                    data-filename="${escapedFilename}"
+                    ondblclick="triggerReply(${msg.id})">
+                    
+                    ${!isMe && !msg.is_deleted ? `
+                        <div class="text-[11px] font-bold mb-1 tracking-wide flex items-center gap-1.5" style="color: ${avatarInfo.color};">
+                            <span>${avatarInfo.emoji}</span>
+                            <span>${msg.sender_name}</span>
+                        </div>
+                    ` : ''}
+                    
+                    ${contentHtml}
+                    
+                    <!-- Timestamp, Star badge, & WhatsApp Ticks -->
+                    <div class="flex items-center justify-end gap-1 text-[10px] ${isMe ? 'text-red-200/80' : 'text-gray-400'} mt-1 select-none">
+                        <span id="star-badge-${msg.id}" class="${isStarred ? '' : 'hidden'} text-yellow-300 text-xs">⭐</span>
+                        <span>${msg.created_at}</span>
+                        ${isMe && !msg.is_deleted ? '<span class="text-cyan-300 font-bold ml-0.5 tracking-tighter" title="Sent">✓✓</span>' : ''}
+                    </div>
+                </div>
+
+                <!-- Floating Emoji Reaction Badges (WhatsApp Style) -->
+                <div id="reactions-container-${msg.id}" class="flex flex-wrap gap-1 mt-1 px-1 z-10">
+                    <!-- Populated dynamically -->
+                </div>
             </div>
         `;
         
         messagesList.appendChild(div);
+        if (!msg.is_deleted) {
+            updateReactionsUI(msg.id, msg.reactions);
+        }
     }
     
     async function fetchMessages() {
         try {
-            const response = await fetch(`${apiGetUrl}?last_id=${lastMessageId}`, {
-                headers: {'X-Requested-With': 'XMLHttpRequest'}
+            const response = await fetch(`${apiGetUrl}?last_id=${lastMessageId}&sender_name=${encodeURIComponent(mySenderName)}`, {
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'X-Sender-Name': mySenderName
+                }
             });
             const data = await response.json();
             
-            if (data.status === 'success' && data.messages.length > 0) {
-                let shouldScroll = chatContainer.scrollTop + chatContainer.clientHeight >= chatContainer.scrollHeight - 50;
+            if (data.status === 'success') {
+                // Real-time Reaction & Deletion Sync for existing messages in the room
+                if (data.reactions_map) {
+                    for (const [id, meta] of Object.entries(data.reactions_map)) {
+                        messagesReactionsData[id] = meta.reactions || {};
+                        updateReactionsUI(id, meta.reactions);
+                        if (meta.is_deleted) {
+                            markMessageAsDeletedInUI(id, meta.text_content);
+                        }
+                    }
+                }
+
+                // New messages handling
+                if (data.messages && data.messages.length > 0) {
+                    const wasBottom = isNearBottom();
+                    let newMsgsCount = 0;
+                    
+                    data.messages.forEach(msg => {
+                        appendMessage(msg);
+                        if (msg.id > lastMessageId) {
+                            lastMessageId = msg.id;
+                            if (!msg.is_me && !msg.is_system) newMsgsCount++;
+                        }
+                    });
+                    
+                    if (wasBottom || lastMessageId <= data.messages[0].id) {
+                        chatContainer.scrollTop = chatContainer.scrollHeight;
+                    } else if (newMsgsCount > 0) {
+                        unreadCount += newMsgsCount;
+                        unreadCounterBadge.textContent = unreadCount;
+                        unreadCounterBadge.classList.remove('hidden');
+                        scrollToBottomBtn.classList.remove('hidden');
+                    }
+                }
                 
-                data.messages.forEach(msg => {
-                    appendMessage(msg);
-                    lastMessageId = msg.id;
-                });
-                
-                if (shouldScroll || lastMessageId <= data.messages[0].id) {
-                    chatContainer.scrollTop = chatContainer.scrollHeight;
+                // Update Live Typing Indicator
+                if (data.active_typers && data.active_typers.length > 0) {
+                    typingText.textContent = `${data.active_typers.join(', ')} is swinging a web...`;
+                    typingIndicator.classList.remove('hidden');
+                    typingIndicator.classList.add('flex');
+                } else {
+                    typingIndicator.classList.add('hidden');
+                    typingIndicator.classList.remove('flex');
                 }
             }
         } catch (err) {
@@ -420,9 +1592,8 @@
         }
     }
     
-    // Poll every 2 seconds
-    setInterval(fetchMessages, 2000);
-    // Initial fetch
+    // Initial fetch & poll every 1.5s
     fetchMessages();
+    setInterval(fetchMessages, 1500);
 </script>
 {% endblock %}
