@@ -5,26 +5,33 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}SPIDDY — Web File Drop | Free Anonymous Temporary File Sharing{% endblock %}</title>
+    <title>{% block title %}SPIDDY Web Drop — Anonymous File Sharing & Temporary Rooms | Secret PIN Transfer{% endblock %}</title>
     
     <!-- Primary Meta SEO Tags -->
-    <meta name="description" content="{% block meta_description %}Share large files up to 2GB instantly with secret 6-digit PIN. Anonymous, encrypted, auto self-destructs in 24 hours. No signup required.{% endblock %}">
-    <meta name="keywords" content="{% block meta_keywords %}file transfer, anonymous file drop, temporary file upload, 2gb file share, encrypted file drop, self destructing files, spiddy web, secret pin file share, free file sharing, send large files online, temp file transfer, quick file drop, no signup file share, qr file sharing, secure PIN file upload{% endblock %}">
-    <meta name="robots" content="index, follow">
-    <meta name="author" content="SpiddyWeb">
+    <meta name="description" content="{% block meta_description %}Share large files up to 2GB anonymously with a 6-digit secret PIN or create encrypted Spider-Verse web chat rooms. 24-hour auto self-destruction. No signup required. Fast, private file transfer built by Darshan Satbhai.{% endblock %}">
+    <meta name="keywords" content="{% block meta_keywords %}spiddy web drop, spiddy file transfer, darshan satbhai, anonymous file drop, temporary file upload, secret pin file share, 2gb free file upload, self destructing files, ephemeral chat room, encrypted web drop, private file transfer without signup, satbhai444, quick file drop, secure PIN file upload{% endblock %}">
+    <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
+    <meta name="author" content="Darshan Satbhai">
+    <meta name="creator" content="Darshan Satbhai">
+    <meta name="publisher" content="SpiddyWeb">
+    <meta name="application-name" content="Spiddy Web Drop">
     <meta name="google-site-verification" content="PjZTecmawFxov2Kh5HafnCUf4h22Hj8WKgDPNp-3yjo" />
 
     <!-- Open Graph / Facebook / WhatsApp Meta Tags -->
     <meta property="og:type" content="website">
-    <meta property="og:title" content="SPIDDY — Web File Drop | Fast Anonymous File Sharing">
-    <meta property="og:description" content="Share files up to 2GB with a secret 6-digit PIN. Anonymous, encrypted, auto self-destructs in 24 hours.">
-    <meta property="og:url" content="https://spiddy-web.vercel.app/">
-    <meta property="og:site_name" content="SpiddyWeb">
+    <meta property="og:title" content="SPIDDY Web Drop — Fast Anonymous File Sharing with Secret PIN">
+    <meta property="og:description" content="Send files up to 2GB instantly with secret 6-digit PINs and real-time Spider-Verse chat rooms. Zero logs, auto self-destructs. Built by Darshan Satbhai.">
+    <meta property="og:url" content="https://spiddy-web.vercel.app{{ request.path }}">
+    <meta property="og:site_name" content="Spiddy Web Drop">
+    <meta property="og:image" content="https://raw.githubusercontent.com/Satbhai444/Spiddy-Web/main/drop/static/drop/images/spiderman.png">
+    <meta property="og:image:alt" content="Spiddy Web Drop - Anonymous File Sharing Logo">
 
     <!-- Twitter Card Meta Tags -->
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="SPIDDY — Web File Drop">
-    <meta name="twitter:description" content="Share files up to 2GB with a secret 6-digit PIN. Self-destructs in 24 hours.">
+    <meta name="twitter:title" content="SPIDDY Web Drop — Anonymous PIN File Transfer">
+    <meta name="twitter:description" content="Fast, encrypted 2GB file sharing with 6-digit PIN & Spider-Verse chat rooms. No signup needed. Created by Darshan Satbhai.">
+    <meta name="twitter:creator" content="@Satbhai444">
+    <meta name="twitter:image" content="https://raw.githubusercontent.com/Satbhai444/Spiddy-Web/main/drop/static/drop/images/spiderman.png">
 
     <!-- Canonical URL -->
     <link rel="canonical" href="https://spiddy-web.vercel.app{{ request.path }}">
@@ -40,21 +47,57 @@
     <meta name="apple-mobile-web-app-title" content="SpiddyWeb">
     <link rel="apple-touch-icon" href="https://raw.githubusercontent.com/Satbhai444/Spiddy-Web/main/drop/static/drop/images/spiderman.png">
 
-    <!-- Schema.org JSON-LD Structured Data -->
+    <!-- Schema.org JSON-LD Linked Entity Graph (E-E-A-T & Google Knowledge Graph) -->
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
-      "@type": "WebApplication",
-      "name": "SpiddyWeb File Drop",
-      "url": "https://spiddy-web.vercel.app",
-      "description": "High-speed temporary file sharing with secret PIN security, 2GB upload limit, and auto self-destruction.",
-      "applicationCategory": "UtilitiesApplication",
-      "operatingSystem": "All",
-      "offers": {
-        "@type": "Offer",
-        "price": "0",
-        "priceCurrency": "USD"
-      }
+      "@graph": [
+        {
+          "@type": "WebApplication",
+          "@id": "https://spiddy-web.vercel.app/#webapp",
+          "name": "Spiddy Web Drop",
+          "alternateName": ["SpiddyWeb", "Spiddy File Transfer", "Spiddy Web"],
+          "url": "https://spiddy-web.vercel.app",
+          "description": "High-speed temporary file sharing with secret 6-digit PIN protection, 2GB upload limit, real-time encrypted Spider-Verse chat rooms, voice notes, and 24h auto self-destruction.",
+          "applicationCategory": "UtilitiesApplication",
+          "operatingSystem": "All",
+          "inLanguage": "en",
+          "creator": {
+            "@type": "Person",
+            "@id": "https://github.com/Satbhai444#darshansatbhai",
+            "name": "Darshan Satbhai",
+            "url": "https://github.com/Satbhai444",
+            "sameAs": [
+              "https://github.com/Satbhai444"
+            ],
+            "jobTitle": "Full Stack Software Engineer & Creator"
+          },
+          "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "USD"
+          },
+          "featureList": [
+            "Secret 6-Digit PIN File Transfer",
+            "Large File Sharing up to 2GB",
+            "Auto Self-Destruct in 24 Hours",
+            "One-Time Download Mode",
+            "Spider-Verse Web Chat Rooms",
+            "Real-time WhatsApp-style Emoji Reactions",
+            "Voice Notes with Audio Scrubber",
+            "End-to-Room Encryption & Zero Logs"
+          ]
+        },
+        {
+          "@type": "Person",
+          "@id": "https://github.com/Satbhai444#darshansatbhai",
+          "name": "Darshan Satbhai",
+          "url": "https://github.com/Satbhai444",
+          "sameAs": [
+            "https://github.com/Satbhai444"
+          ]
+        }
+      ]
     }
     </script>
     <script src="https://cdn.tailwindcss.com"></script>
@@ -280,6 +323,9 @@
             <a href="{% url 'dmca' %}" class="hover:text-gray-200 transition-colors">DMCA</a>
             <span>&middot;</span>
             <a href="{% url 'contact' %}" class="hover:text-gray-200 transition-colors">Contact</a>
+        </div>
+        <div class="flex items-center justify-center gap-2 text-gray-400 text-xs">
+            <span>Engineered with 🕸️ by <a href="https://github.com/Satbhai444" target="_blank" rel="noopener noreferrer" class="text-red-400 hover:text-white font-semibold transition-colors underline decoration-red-500/40 underline-offset-2">Darshan Satbhai</a></span>
         </div>
         <div class="flex items-center justify-center gap-2 text-gray-500">
             <span class="w-2 h-2 rounded-full bg-green-500 animate-ping"></span>
