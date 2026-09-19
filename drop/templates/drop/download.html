@@ -233,17 +233,69 @@
     <h2 class="text-2xl font-bold mb-6 text-center text-white" data-reveal>Catch the Web (Download)</h2>
 
     {% if error %}
-    <div class="bg-red-900/50 border border-red-500 text-red-200 p-4 rounded-lg mb-6 text-sm text-center font-semibold">
+    <div id="serverErrorMsg" class="bg-red-900/50 border border-red-500 text-red-200 p-4 rounded-lg mb-6 text-sm text-center font-semibold">
         {{ error }}
     </div>
     {% endif %}
 
-    <form action="{% url 'download' %}" method="post" class="space-y-4 text-center" data-reveal>
+    <style>
+        @keyframes spin-fast {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        .animate-spin-fast {
+            animation: spin-fast 0.6s linear infinite;
+        }
+
+        @keyframes destruct-0 { 0% { transform: translate(0, 0) rotate(0); opacity: 1; } 50% { transform: translate(150px, 0) rotate(180deg) scale(0.5); opacity: 0.8; } 100% { transform: translate(150px, 0) rotate(360deg) scale(1.5); opacity: 0; filter: blur(5px); } }
+        @keyframes destruct-1 { 0% { transform: translate(0, 0) rotate(0); opacity: 1; } 50% { transform: translate(90px, -20px) rotate(-180deg) scale(0.5); opacity: 0.8; } 100% { transform: translate(90px, -20px) rotate(-360deg) scale(1.5); opacity: 0; filter: blur(5px); } }
+        @keyframes destruct-2 { 0% { transform: translate(0, 0) rotate(0); opacity: 1; } 50% { transform: translate(30px, 20px) rotate(180deg) scale(0.5); opacity: 0.8; } 100% { transform: translate(30px, 20px) rotate(360deg) scale(1.5); opacity: 0; filter: blur(5px); } }
+        @keyframes destruct-3 { 0% { transform: translate(0, 0) rotate(0); opacity: 1; } 50% { transform: translate(-30px, -20px) rotate(-180deg) scale(0.5); opacity: 0.8; } 100% { transform: translate(-30px, -20px) rotate(-360deg) scale(1.5); opacity: 0; filter: blur(5px); } }
+        @keyframes destruct-4 { 0% { transform: translate(0, 0) rotate(0); opacity: 1; } 50% { transform: translate(-90px, 20px) rotate(180deg) scale(0.5); opacity: 0.8; } 100% { transform: translate(-90px, 20px) rotate(360deg) scale(1.5); opacity: 0; filter: blur(5px); } }
+        @keyframes destruct-5 { 0% { transform: translate(0, 0) rotate(0); opacity: 1; } 50% { transform: translate(-150px, 0) rotate(-180deg) scale(0.5); opacity: 0.8; } 100% { transform: translate(-150px, 0) rotate(-360deg) scale(1.5); opacity: 0; filter: blur(5px); } }
+
+        .destruct-0 { animation: destruct-0 0.6s ease-in forwards; }
+        .destruct-1 { animation: destruct-1 0.6s ease-in forwards; }
+        .destruct-2 { animation: destruct-2 0.6s ease-in forwards; }
+        .destruct-3 { animation: destruct-3 0.6s ease-in forwards; }
+        .destruct-4 { animation: destruct-4 0.6s ease-in forwards; }
+        .destruct-5 { animation: destruct-5 0.6s ease-in forwards; }
+
+        @keyframes pop-tick {
+            0% { transform: scale(0); opacity: 0; }
+            50% { transform: scale(1.2); opacity: 1; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        .animate-pop-tick {
+            animation: pop-tick 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+    </style>
+
+    <form id="pinForm" action="{% url 'download' %}" method="post" class="space-y-4 text-center" data-reveal>
         {% csrf_token %}
         <p class="text-gray-300 text-sm">Enter the 6-digit PIN below:</p>
-        <input type="text" name="pin" maxlength="6"
-            class="w-full bg-gray-900 border-2 border-blue-500 rounded-lg p-4 text-center text-4xl font-mono font-bold text-white tracking-[0.25em] focus:outline-none focus:border-red-500 transition-colors"
-            placeholder="------" required autocomplete="off" inputmode="numeric" pattern="[0-9]{6}">
+        
+        <div class="relative w-full flex justify-center py-2" id="pin-wrapper">
+            <div class="flex justify-center gap-2 sm:gap-3 relative z-10" id="pin-container">
+                <!-- 6 PIN Boxes (Blue theme when typing) -->
+                <input type="text" maxlength="1" inputmode="numeric" autocomplete="off" class="pin-box w-11 h-14 sm:w-14 sm:h-16 bg-gray-900 border-2 border-gray-700 rounded-xl text-center text-2xl sm:text-3xl font-bold text-white focus:border-blue-500 focus:bg-gray-800 focus:ring-4 focus:ring-blue-500/30 transition-all duration-200 outline-none shadow-[0_4px_15px_rgba(0,0,0,0.5)] placeholder-gray-700" placeholder="•">
+                <input type="text" maxlength="1" inputmode="numeric" autocomplete="off" class="pin-box w-11 h-14 sm:w-14 sm:h-16 bg-gray-900 border-2 border-gray-700 rounded-xl text-center text-2xl sm:text-3xl font-bold text-white focus:border-blue-500 focus:bg-gray-800 focus:ring-4 focus:ring-blue-500/30 transition-all duration-200 outline-none shadow-[0_4px_15px_rgba(0,0,0,0.5)] placeholder-gray-700" placeholder="•">
+                <input type="text" maxlength="1" inputmode="numeric" autocomplete="off" class="pin-box w-11 h-14 sm:w-14 sm:h-16 bg-gray-900 border-2 border-gray-700 rounded-xl text-center text-2xl sm:text-3xl font-bold text-white focus:border-blue-500 focus:bg-gray-800 focus:ring-4 focus:ring-blue-500/30 transition-all duration-200 outline-none shadow-[0_4px_15px_rgba(0,0,0,0.5)] placeholder-gray-700" placeholder="•">
+                <input type="text" maxlength="1" inputmode="numeric" autocomplete="off" class="pin-box w-11 h-14 sm:w-14 sm:h-16 bg-gray-900 border-2 border-gray-700 rounded-xl text-center text-2xl sm:text-3xl font-bold text-white focus:border-blue-500 focus:bg-gray-800 focus:ring-4 focus:ring-blue-500/30 transition-all duration-200 outline-none shadow-[0_4px_15px_rgba(0,0,0,0.5)] placeholder-gray-700" placeholder="•">
+                <input type="text" maxlength="1" inputmode="numeric" autocomplete="off" class="pin-box w-11 h-14 sm:w-14 sm:h-16 bg-gray-900 border-2 border-gray-700 rounded-xl text-center text-2xl sm:text-3xl font-bold text-white focus:border-blue-500 focus:bg-gray-800 focus:ring-4 focus:ring-blue-500/30 transition-all duration-200 outline-none shadow-[0_4px_15px_rgba(0,0,0,0.5)] placeholder-gray-700" placeholder="•">
+                <input type="text" maxlength="1" inputmode="numeric" autocomplete="off" class="pin-box w-11 h-14 sm:w-14 sm:h-16 bg-gray-900 border-2 border-gray-700 rounded-xl text-center text-2xl sm:text-3xl font-bold text-white focus:border-blue-500 focus:bg-gray-800 focus:ring-4 focus:ring-blue-500/30 transition-all duration-200 outline-none shadow-[0_4px_15px_rgba(0,0,0,0.5)] placeholder-gray-700" placeholder="•">
+            </div>
+            
+            <!-- Success Tick (Hidden by default) -->
+            <div id="success-tick" class="absolute inset-0 flex items-center justify-center opacity-0 pointer-events-none z-20 scale-0">
+                <div class="w-16 h-16 bg-green-500 rounded-full flex items-center justify-center shadow-[0_0_20px_#22c55e]">
+                    <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="4" d="M5 13l4 4L19 7"></path>
+                    </svg>
+                </div>
+            </div>
+        </div>
+        <input type="hidden" name="pin" id="hiddenPin" required pattern="[0-9]{6}">
         
         <input type="password" name="password" placeholder="Passcode (if drop is password-protected)"
             class="w-full bg-gray-900 border border-gray-700 rounded-lg p-3 text-center text-sm text-white focus:outline-none focus:border-blue-400 placeholder-gray-600">
@@ -260,5 +312,212 @@
             file instead?</a>
     </div>
 </div>
+<script>
+    (function() {
+        console.log("PIN Animation Script Initializing...");
+        const pinBoxes = document.querySelectorAll('.pin-box');
+        const hiddenPin = document.getElementById('hiddenPin');
+        const form = document.getElementById('pinForm');
+        const successTick = document.getElementById('success-tick');
+        
+        if (pinBoxes.length === 0) {
+            console.log("No pin boxes found!");
+            return;
+        }
+        
+        console.log("Found " + pinBoxes.length + " pin boxes. Form:", form);
+
+        function updateHiddenPin() {
+            hiddenPin.value = Array.from(pinBoxes).map(b => b.value).join('');
+        }
+
+        pinBoxes.forEach((box, index) => {
+            box.addEventListener('input', (e) => {
+                box.value = box.value.replace(/[^0-9]/g, ''); // Numbers only
+                if (box.value && index < pinBoxes.length - 1) {
+                    pinBoxes[index + 1].focus();
+                }
+                updateHiddenPin();
+            });
+
+            box.addEventListener('keydown', (e) => {
+                if (e.key === 'Backspace' && !box.value && index > 0) {
+                    pinBoxes[index - 1].focus();
+                }
+            });
+
+            box.addEventListener('paste', (e) => {
+                e.preventDefault();
+                const pastedData = (e.clipboardData || window.clipboardData).getData('text');
+                const numbers = pastedData.replace(/[^0-9]/g, '').slice(0, 6);
+                for (let i = 0; i < numbers.length; i++) {
+                    if (pinBoxes[i]) {
+                        pinBoxes[i].value = numbers[i];
+                        if (i < pinBoxes.length - 1) pinBoxes[i + 1].focus();
+                    }
+                }
+                updateHiddenPin();
+            });
+        });
+        
+        // Form AJAX Submission & Animation Handling
+        if (form) {
+            form.addEventListener('submit', async (e) => {
+                console.log("Form submitted via JS!");
+                e.preventDefault();
+                updateHiddenPin();
+                
+                // Clear any existing error messages
+                const existingError = form.parentElement.querySelector('#serverErrorMsg');
+                if (existingError) existingError.remove();
+
+                // 1. Initial Animation: Make them spin
+                pinBoxes.forEach(box => {
+                    box.classList.add('animate-spin-fast');
+                    box.readOnly = true;
+                });
+
+                const formData = new FormData(form);
+                console.log("FormData PIN:", formData.get('pin'));
+                
+                try {
+                    const response = await fetch(form.action, {
+                        method: 'POST',
+                        body: formData,
+                        headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                    });
+                    
+                    const html = await response.text();
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(html, 'text/html');
+                    
+                    // Check if the response contains an error message for wrong PIN
+                    const errorDiv = doc.getElementById('serverErrorMsg');
+                    
+                    if (errorDiv) {
+                        console.log("Wrong PIN detected.");
+                        // WRONG PIN -> Destruct Animation
+                        pinBoxes.forEach((box, i) => {
+                            box.classList.remove('animate-spin-fast');
+                            box.classList.add(`destruct-${i}`);
+                        });
+                        
+                        setTimeout(() => {
+                            pinBoxes.forEach((box, i) => {
+                                box.classList.remove(`destruct-${i}`);
+                                box.value = ''; 
+                                box.readOnly = false;
+                                // Flash red
+                                box.classList.remove('border-gray-700', 'focus:border-blue-500');
+                                box.classList.add('border-red-500', 'bg-red-900', 'text-red-500');
+                                setTimeout(() => {
+                                    box.classList.remove('border-red-500', 'bg-red-900', 'text-red-500');
+                                    box.classList.add('border-gray-700', 'focus:border-blue-500');
+                                }, 500);
+                            });
+                            updateHiddenPin();
+                            pinBoxes[0].focus();
+                            
+                            // Show error message
+                            const newError = document.createElement('div');
+                            newError.id = 'serverErrorMsg';
+                            newError.className = 'bg-red-900/50 border border-red-500 text-red-200 p-4 rounded-lg mb-6 text-sm text-center font-semibold animate-pulse';
+                            newError.textContent = errorDiv.textContent.trim();
+                            form.parentNode.insertBefore(newError, form);
+                        }, 600);
+                        
+                    } else {
+                        console.log("Success PIN detected.");
+                        // CORRECT PIN -> Green Tick Animation
+                        pinBoxes.forEach(box => {
+                            box.classList.remove('animate-spin-fast');
+                            box.style.transform = 'scale(0)';
+                            box.style.opacity = '0';
+                        });
+                        
+                        successTick.classList.remove('opacity-0', 'scale-0');
+                        successTick.classList.add('animate-pop-tick');
+                        
+                        // Web Pull Animation
+                        setTimeout(() => {
+                            if (window.playThwipSound) window.playThwipSound();
+                            
+                            const targetForm = document.querySelector('[data-page-card]');
+                            const rect = targetForm.getBoundingClientRect();
+                            
+                            // Create web string
+                            const web = document.createElement('div');
+                            web.style.position = 'fixed';
+                            web.style.top = '-100vh';
+                            web.style.left = '50%';
+                            web.style.transform = 'translateX(-50%)';
+                            web.style.width = '3px';
+                            web.style.height = '100vh';
+                            web.style.background = 'linear-gradient(to bottom, rgba(255,255,255,0.2) 0%, rgba(255,255,255,1) 100%)';
+                            web.style.boxShadow = '0 0 10px rgba(255,255,255,0.8)';
+                            web.style.zIndex = '9999';
+                            
+                            // Create web splat at the bottom
+                            const splat = document.createElement('div');
+                            splat.style.position = 'absolute';
+                            splat.style.bottom = '-15px';
+                            splat.style.left = '50%';
+                            splat.style.transform = 'translateX(-50%)';
+                            splat.style.width = '30px';
+                            splat.style.height = '30px';
+                            splat.style.background = 'radial-gradient(circle, #ffffff 30%, rgba(255,255,255,0.2) 100%)';
+                            splat.style.borderRadius = '50%';
+                            splat.style.boxShadow = '0 0 15px rgba(255,255,255,0.9)';
+                            splat.style.filter = 'blur(1px)';
+                            web.appendChild(splat);
+                            
+                            document.body.appendChild(web);
+                            
+                            if (window.gsap) {
+                                // Shoot down
+                                gsap.to(web, {
+                                    top: rect.top - window.innerHeight + 40, // Splat lands near top of card
+                                    duration: 0.25,
+                                    ease: "power2.in",
+                                    onComplete: () => {
+                                        // Optional: Shake card slightly on impact
+                                        gsap.fromTo(targetForm, {y: 0}, {y: 5, duration: 0.05, yoyo: true, repeat: 1});
+                                        
+                                        // Yank up after a tiny pause
+                                        setTimeout(() => {
+                                            if (window.playThwipSound) window.playThwipSound(); // second pull sound
+                                            gsap.to([targetForm, web], {
+                                                y: -window.innerHeight,
+                                                duration: 0.4,
+                                                ease: "back.in(1.2)",
+                                                onComplete: () => {
+                                                    document.open();
+                                                    document.write(html);
+                                                    document.close();
+                                                }
+                                            });
+                                        }, 150);
+                                    }
+                                });
+                            } else {
+                                setTimeout(() => {
+                                    document.open();
+                                    document.write(html);
+                                    document.close();
+                                }, 500);
+                            }
+                        }, 800); // Wait for the tick animation to finish
+                    }
+                } catch (err) {
+                    console.error("Fetch Error:", err);
+                    form.submit(); // Fallback to normal submission if fetch fails
+                }
+            });
+        }
+        
+        // Focus first box on load
+        setTimeout(() => pinBoxes[0].focus(), 100);
+    })();
+</script>
 {% endif %}
 {% endblock %}

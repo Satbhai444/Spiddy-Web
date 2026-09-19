@@ -5,5 +5,7 @@ db.sqlite3
 media/
 staticfiles_build/
 .vercel
-
-.vercel
+brag-output/
+brag-video/
+.vscode/
+.idea/

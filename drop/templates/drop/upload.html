@@ -47,30 +47,29 @@
         </div>
 
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <label class="block">
-                <span class="block text-xs uppercase tracking-widest text-gray-500 mb-2">Expiry</span>
+            <label class="flex flex-col justify-end">
+                <span class="text-xs uppercase tracking-widest text-gray-500 mb-2 truncate">Expiry</span>
                 <select name="expires_hours"
-                    class="w-full bg-gray-900 border border-gray-700 rounded-lg p-3 text-white focus:outline-none focus:border-blue-400">
+                    class="h-[52px] w-full bg-gray-900 border border-gray-700 rounded-lg px-3 text-white focus:outline-none focus:border-blue-400">
                     <option value="1">1 Hour</option>
                     <option value="6">6 Hours</option>
                     <option value="24" selected>24 Hours</option>
                     <option value="168">7 Days</option>
                 </select>
             </label>
-            <label class="block">
-                <span class="block text-xs uppercase tracking-widest text-gray-500 mb-2">Secret Password (Optional)</span>
+            <label class="flex flex-col justify-end">
+                <span class="text-xs uppercase tracking-widest text-gray-500 mb-2 truncate" title="Secret Password (Optional)">Passcode (Opt.)</span>
                 <input type="password" name="password" placeholder="Passcode (Optional)"
-                    class="w-full bg-gray-900 border border-gray-700 rounded-lg p-3 text-white focus:outline-none focus:border-red-400 placeholder-gray-600">
+                    class="h-[52px] w-full bg-gray-900 border border-gray-700 rounded-lg px-3 text-white focus:outline-none focus:border-red-400 placeholder-gray-600">
             </label>
-            <label class="block">
-                <span class="block text-xs uppercase tracking-widest text-gray-500 mb-2">Mode</span>
-                <span
-                    class="flex items-center gap-3 bg-gray-900 border border-gray-700 rounded-lg p-3 h-[50px] text-sm text-gray-300">
+            <div class="flex flex-col justify-end">
+                <span class="text-xs uppercase tracking-widest text-gray-500 mb-2 truncate">Mode</span>
+                <label class="h-[52px] w-full flex items-center gap-3 bg-gray-900 border border-gray-700 rounded-lg px-3 text-sm text-gray-300 hover:border-red-400 transition-colors cursor-pointer group">
                     <input type="checkbox" name="one_time"
-                        class="h-4 w-4 rounded border-gray-500 bg-gray-800 text-red-500 focus:ring-red-500">
-                    One-time download
-                </span>
-            </label>
+                        class="h-4 w-4 rounded border-gray-500 bg-gray-800 text-red-500 focus:ring-red-500 cursor-pointer">
+                    <span class="truncate select-none group-hover:text-white transition-colors">One-time link</span>
+                </label>
+            </div>
         </div>
 
         <div id="uploadProgress" class="hidden">

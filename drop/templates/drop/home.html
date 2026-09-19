@@ -8,19 +8,19 @@
 {% block main_class %}w-full max-w-5xl px-4{% endblock %}
 
 {% block header %}
-<nav class="fixed top-0 left-0 right-0 z-50 px-6 py-3 flex items-center justify-between" data-reveal="header"
+<nav class="fixed top-0 left-0 right-0 z-50 px-3 sm:px-6 py-2 sm:py-3 flex items-center justify-between" data-reveal="header"
     style="background:rgba(15,15,19,0.92); backdrop-filter:blur(12px); border-bottom:1px solid rgba(81,140,202,0.2);">
-    <a href="{% url 'home' %}" class="flex items-center gap-2">
-        <img src="https://raw.githubusercontent.com/Satbhai444/Spiddy-Web/main/drop/static/drop/images/spiderman.png" alt="Spider-Man" class="h-9 object-contain drop-shadow-[0_0_8px_rgba(226,54,54,0.8)]">
-        <span class="spidey-title text-3xl text-white tracking-wide">SPIDDY</span>
+    <a href="{% url 'home' %}" class="flex items-center gap-1.5 sm:gap-2 shrink-0">
+        <img src="https://raw.githubusercontent.com/Satbhai444/Spiddy-Web/main/drop/static/drop/images/spiderman.png" alt="Spider-Man" class="h-6 sm:h-9 object-contain drop-shadow-[0_0_8px_rgba(226,54,54,0.8)]">
+        <span class="spidey-title text-xl sm:text-3xl text-white tracking-wide">SPIDDY</span>
     </a>
-    <div class="flex gap-3 items-center">
+    <div class="flex gap-1.5 sm:gap-3 items-center shrink-0">
         <button onclick="openRoomModal()"
-            class="text-gray-300 hover:text-white font-bold py-2 px-3 rounded-lg uppercase tracking-wider text-xs border border-gray-600 hover:border-gray-400 transition-colors cta-btn" data-spidey-msg="Spider-Verse Room!">Rooms 🕸️</button>
+            class="text-gray-300 hover:text-white font-bold py-1.5 px-2 sm:py-2 sm:px-3 rounded-lg uppercase tracking-wider text-[9px] sm:text-xs border border-gray-600 hover:border-gray-400 transition-colors cta-btn" data-spidey-msg="Spider-Verse Room!">Rooms 🕸️</button>
         <a href="{% url 'upload' %}"
-            class="btn-red text-white text-xs font-bold py-2 px-5 rounded-lg uppercase tracking-wider cta-btn" data-spidey-msg="Jaala fek aur file share kar!">Upload</a>
+            class="btn-red text-white text-[9px] sm:text-xs font-bold py-1.5 px-3 sm:py-2 sm:px-5 rounded-lg uppercase tracking-wider cta-btn" data-spidey-msg="Jaala fek aur file share kar!">Upload</a>
         <a href="{% url 'download' %}"
-            class="btn-blue text-white text-xs font-bold py-2 px-5 rounded-lg uppercase tracking-wider cta-btn" data-spidey-msg="Swing kar aur file pakad!">Download</a>
+            class="btn-blue text-white text-[9px] sm:text-xs font-bold py-1.5 px-3 sm:py-2 sm:px-5 rounded-lg uppercase tracking-wider cta-btn" data-spidey-msg="Swing kar aur file pakad!">Download</a>
     </div>
 </nav>
 {% endblock %}

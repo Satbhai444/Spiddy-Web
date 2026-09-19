@@ -51,7 +51,7 @@
     </a>
 </div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script src="https://unpkg.com/qr-code-styling@1.5.0/lib/qr-code-styling.js"></script>
 <script>
     let totalSeconds = {{ expires_hours }} * 3600;
     const el = document.getElementById('countdown');
@@ -67,11 +67,28 @@
     tick();
     setInterval(tick, 1000);
 
-    new QRCode(document.getElementById('qrCode'), {
-        text: shareUrl,
-        width: 170,
-        height: 170,
+    const qrCode = new QRCodeStyling({
+        width: 180,
+        height: 180,
+        data: shareUrl,
+        image: "https://raw.githubusercontent.com/Satbhai444/Spiddy-Web/main/drop/static/drop/images/spiderman.png",
+        dotsOptions: {
+            color: "#e23636",
+            type: "rounded"
+        },
+        cornersSquareOptions: {
+            color: "#518CCA",
+            type: "extra-rounded"
+        },
+        backgroundOptions: {
+            color: "#ffffff",
+        },
+        imageOptions: {
+            crossOrigin: "anonymous",
+            margin: 5
+        }
     });
+    qrCode.append(document.getElementById("qrCode"));
 
     async function copyText(text, button, okText, toastMsg) {
         try {
